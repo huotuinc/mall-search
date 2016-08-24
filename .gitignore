@@ -1,0 +1,16 @@
+.DS_Store
+
+.project
+.classpath
+.springBeans
+.settings/
+target/
+
+#IntelliJ Stuff
+.idea
+*.iml
+*.eml
+
+*.log
+platform.log*
+iqiyi.log*
