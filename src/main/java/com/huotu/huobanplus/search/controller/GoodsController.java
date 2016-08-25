@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -74,7 +75,7 @@ public interface GoodsController {
      */
     @RequestMapping(value = "/udpate", method = RequestMethod.POST)
     void update(@RequestParam(value = "id") Long id
-            , @RequestParam(value = "updateFrequency", required = false) UpdateFrequency updateFrequency);
+            , @RequestParam(value = "updateFrequency", required = false) UpdateFrequency updateFrequency) throws IOException;
 
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     String test();

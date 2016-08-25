@@ -146,4 +146,10 @@ public class Goods {
      */
     @Field
     private String priceDesc;
+
+    /**
+     * 返利信息
+     */
+    @Field
+    private String rebateDesc;
 }

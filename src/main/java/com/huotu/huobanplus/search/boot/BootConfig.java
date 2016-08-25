@@ -30,7 +30,7 @@ import java.io.IOException;
 @ComponentScan({"com.huotu.huobanplus.search.service", "com.huotu.huobanplus.search.controller"})
 @EnableSolrRepositories(schemaCreationSupport = true, multicoreSupport = true)
 //@ImportResource(value = "classpath:spring-jpa.xml")
-@EnableJpaRepositories(value = {"com.huotu.huobanplus.search.repository.jpa"})
+//@EnableJpaRepositories(value = {"com.huotu.huobanplus.search.repository.jpa"})
 @Import(value = {LoggingConfig.class, CommonClientSpringConfig.class})
 public class BootConfig {
 

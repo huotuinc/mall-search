@@ -1,5 +1,6 @@
 package com.huotu.huobanplus.search;
 
+import com.huotu.huobanplus.common.entity.MallTag;
 import com.huotu.huobanplus.search.boot.BootConfig;
 import com.huotu.huobanplus.search.model.solr.Goods;
 import com.huotu.huobanplus.search.model.view.ViewGoodsList;
@@ -18,8 +19,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.util.StringUtils;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Administrator on 2016/8/18.
@@ -143,14 +149,14 @@ public class GoodsTest extends BaseTest {
     @Test
     public void searchGoodsFilter() {
         Goods goods = createGoods(1L, "化妆品", "");
-        goods.setCategoryId(100);
-        goods.setBrandsId(200);
+        goods.setCategoryId(100L);
+        goods.setBrandsId(200L);
         goods.setHotspot("海南直发");
         solrGoodsRepository.save(goods);
 
         Goods goods1 = createGoods(2L, "化妆品", "");
-        goods1.setCategoryId(101);
-        goods1.setBrandsId(201);
+        goods1.setCategoryId(101L);
+        goods1.setBrandsId(201L);
         goods1.setHotspot("特价商品 中国制造");
         solrGoodsRepository.save(goods1);
 
@@ -200,15 +206,38 @@ public class GoodsTest extends BaseTest {
     @Test
     public void testPinyin() {
         System.out.println(PinyinUtils.getFullSpell("科技"));
+        String[] x = {"a", "b", "c"};
+        System.out.println(org.apache.commons.lang.StringUtils.join(x, "|"));
 
+        Set<String> t = new HashSet<>();
+        t.add("a");
+        t.add("b");
+        t.add("d");
+
+        StringBuilder tags = new StringBuilder();
+        for (String item : t) {
+            tags.append(item.concat("|"));
+        }
+        System.out.println(tags.toString());
+
+        System.out.println(org.apache.commons.lang.StringUtils.join(t, "|"));
     }
 
     @Test
+    public void testUpdate() throws IOException {
+        goodsService.update(99567L);
+    }
+
+
+    @Test
     public void createGoods() {
-        //创建10万数据
-//        List<Goods> goodses = createGoodsList(1000);
+        // 创建10万数据
+        List<Goods> goodses = createGoodsList(100);
+//        for (Goods goods : goodses) {
+//            solrGoodsRepository.save(goods);
+//        }
 //        solrGoodsRepository.save(goodses);
-////        Assert.assertEquals(goodses.size(), solrGoodsRepository.count());
+//        Assert.assertEquals(goodses.size(), solrGoodsRepository.count());
 //        System.out.println(solrGoodsRepository.count());
     }
 
@@ -235,5 +264,7 @@ public class GoodsTest extends BaseTest {
 //
 //        Goods find = solrGoodsRepository.findOne(20l);
 //        Assert.assertEquals(updateTitle, find.getTitle());
+
+
     }
 }

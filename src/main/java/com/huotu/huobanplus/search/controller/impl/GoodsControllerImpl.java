@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -49,8 +50,8 @@ public class GoodsControllerImpl implements GoodsController {
 
 
     @Override
-    public void update(@RequestParam(value = "id") Long id, @RequestParam(value = "updateFrequency", required = false) UpdateFrequency updateFrequency) {
-
+    public void update(@RequestParam(value = "id") Long id, @RequestParam(value = "updateFrequency", required = false) UpdateFrequency updateFrequency) throws IOException {
+        goodsService.update(id);
     }
 
     @Override
