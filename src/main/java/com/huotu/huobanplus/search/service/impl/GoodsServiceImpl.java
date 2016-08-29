@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.huotu.huobanplus.common.entity.GoodsKeywords;
 import com.huotu.huobanplus.common.entity.MallTag;
 import com.huotu.huobanplus.common.entity.support.SaleTags;
+import com.huotu.huobanplus.sdk.common.repository.GoodsKeywordsRestRepository;
 import com.huotu.huobanplus.sdk.common.repository.GoodsRestRepository;
 import com.huotu.huobanplus.search.model.solr.Goods;
 import com.huotu.huobanplus.search.model.view.Paging;
@@ -36,6 +37,8 @@ public class GoodsServiceImpl implements GoodsService {
     @Autowired
     private GoodsRestRepository goodsRestRepository;
 
+    @Autowired
+    private GoodsKeywordsRestRepository goodsKeywordsRestRepository;
 
     @Override
     public ViewGoodsList search(Long customerId, Integer pageSize, Integer page, Integer levelId
@@ -80,7 +83,7 @@ public class GoodsServiceImpl implements GoodsService {
         }
     }
 
-    public Goods mallGoodsToSolrGoods(com.huotu.huobanplus.common.entity.Goods mallGoods, Goods goods) throws UnsupportedEncodingException {
+    public Goods mallGoodsToSolrGoods(com.huotu.huobanplus.common.entity.Goods mallGoods, Goods goods) throws IOException {
         goods.setId(mallGoods.getId());
         goods.setCustomerId(mallGoods.getOwner().getId());
         goods.setTitle(mallGoods.getTitle());
@@ -93,11 +96,15 @@ public class GoodsServiceImpl implements GoodsService {
 
         goods.setDescription(mallGoods.getDescription());
 
-        Set<GoodsKeywords> mallGoodsKeywords = mallGoods.getKeywords();
+        List<GoodsKeywords> mallGoodsKeywords = goodsKeywordsRestRepository.findAllByGoodsId(mallGoods.getId());
         StringBuilder keyword = new StringBuilder();
         if (mallGoodsKeywords != null) {
-            for (GoodsKeywords goodsKeywords : mallGoodsKeywords)
-                keyword.append(URLDecoder.decode(goodsKeywords.getKeyword(),"utf-8").concat("|"));
+            for (GoodsKeywords goodsKeywords : mallGoodsKeywords) {
+                if (org.springframework.util.StringUtils.isEmpty(keyword.toString()))
+                    keyword.append(goodsKeywords.getKeyword());
+                else
+                    keyword.append("|".concat(goodsKeywords.getKeyword()));
+            }
         }
         goods.setKeyword(keyword.toString());
 
@@ -107,7 +114,12 @@ public class GoodsServiceImpl implements GoodsService {
         StringBuilder tags = new StringBuilder();
         Set<MallTag> mallTags = mallGoods.getTags();
         if (mallTags != null) {
-            for (MallTag mallTag : mallTags) tags.append(mallTag.getTagName().concat("|"));
+            for (MallTag mallTag : mallTags) {
+                if (org.springframework.util.StringUtils.isEmpty(tags.toString()))
+                    tags.append(mallTag.getTagName());
+                else
+                    tags.append("|".concat(mallTag.getTagName()));
+            }
         }
         goods.setTags(tags.toString());
 
