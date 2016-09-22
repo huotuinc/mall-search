@@ -16,15 +16,15 @@ import org.springframework.util.StringUtils;
 public class SolrGoodsRepository extends SimpleSolrRepository<Goods, Long> {
 
     public Page<Goods> search(Long customerId, Integer pageSize, Integer page, Integer levelId
-            , String key, Integer brandsId, Integer categoryId, String hotspot, Integer sorts) {
+            , String key, String brands, String category, String hotspot, Integer sorts) {
 
 
         Criteria criteria = new Criteria("customerId").is(customerId);
-        if (brandsId != null && brandsId > 0) {
-            criteria = criteria.and(new Criteria("brandsId").is(brandsId));
+        if (!StringUtils.isEmpty(brands)) {
+            criteria = criteria.and(new Criteria("brands").is(brands));
         }
-        if (categoryId != null && categoryId > 0) {
-            criteria = criteria.and(new Criteria("categoryId").is(categoryId));
+        if (!StringUtils.isEmpty(category)) {
+            criteria = criteria.and(new Criteria("category").is(category));
         }
         if (!StringUtils.isEmpty(hotspot)) {
             criteria = criteria.and(new Criteria("hotspot").is(hotspot));
@@ -37,7 +37,7 @@ public class SolrGoodsRepository extends SimpleSolrRepository<Goods, Long> {
             criteria1 = criteria1.or(new Criteria("description").is(key));
             criteria1 = criteria1.or(new Criteria("keyword").is(key));
             criteria1 = criteria1.or(new Criteria("tags").is(key));
-            criteria1 = criteria1.or(new Criteria("virturalCatetory").is(key));
+//            criteria1 = criteria1.or(new Criteria("virturalCatetory").is(key));
             criteria1 = criteria1.or(new Criteria("supplier")).is(key);
             criteria = criteria.and(criteria1);
         }

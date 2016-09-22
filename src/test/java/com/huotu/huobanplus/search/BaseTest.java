@@ -41,8 +41,8 @@ public abstract class BaseTest {
         goods.setSupplier("");
         goods.setTags("标签" + id);
 //        goods.setVirturalCatetory("虚拟分类");
-        goods.setBrandsId(100L);
-        goods.setCategoryId(200L);
+        goods.setBrands("");
+        goods.setCategory("");
         goods.setHotspot("免运费");
         goods.setUpdateTime(new Date());
         goods.setSales(sales);
@@ -69,8 +69,8 @@ public abstract class BaseTest {
         goods.setSupplier(supplier);
         goods.setTags(tags);
 //        goods.setVirturalCatetory(virturalCatetory);
-        goods.setBrandsId(100L);
-        goods.setCategoryId(200L);
+        goods.setBrands("");
+        goods.setCategory("");
         goods.setHotspot("免运费");
         goods.setUpdateTime(new Date());
         goods.setSales(1000L);

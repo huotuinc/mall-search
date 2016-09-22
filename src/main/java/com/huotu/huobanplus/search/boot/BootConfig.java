@@ -5,8 +5,10 @@ import com.huotu.huobanplus.search.repository.solr.SolrGoodsRepository;
 import com.huotu.huobanplus.search.repository.solr.SolrHotRepository;
 import com.huotu.huobanplus.search.service.CommonConfigService;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 
+import org.apache.solr.core.CoreContainer;
 import org.luffy.lib.libspring.logging.LoggingConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,6 +18,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.repository.config.EnableSolrRepositories;
 
+import org.springframework.data.solr.server.support.EmbeddedSolrServerFactory;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -28,7 +31,7 @@ import java.io.IOException;
 
 @Configuration
 @ComponentScan({"com.huotu.huobanplus.search.service", "com.huotu.huobanplus.search.controller"})
-@EnableSolrRepositories(schemaCreationSupport = true, multicoreSupport = true)
+@EnableSolrRepositories(schemaCreationSupport = true, multicoreSupport = true,basePackages = "com.acme.solr")
 //@ImportResource(value = "classpath:spring-jpa.xml")
 //@EnableJpaRepositories(value = {"com.huotu.huobanplus.search.repository.jpa"})
 @Import(value = {LoggingConfig.class, CommonClientSpringConfig.class})
@@ -77,9 +80,8 @@ public class BootConfig {
     private SolrTemplate solrGoodsTemplate;
 
     @Bean(name = "solrGoodsTemplate")
-    public SolrTemplate solrGoodsTemplate() {
-        SolrClient solrClient = new HttpSolrClient(commonConfigService.getSolrServerUrl());
-        return new SolrTemplate(solrClient, "goods");
+    public SolrTemplate solrGoodsTemplate() throws ParserConfigurationException, SAXException, IOException {
+        return new SolrTemplate(solrClient(), "goods");
     }
 
 
@@ -95,9 +97,8 @@ public class BootConfig {
     private SolrTemplate solrHotTemplate;
 
     @Bean(name = "solrHotTemplate")
-    public SolrTemplate getSolrHotTemplate() {
-        SolrClient solrClient = new HttpSolrClient(commonConfigService.getSolrServerUrl());
-        return new SolrTemplate(solrClient, "hot");
+    public SolrTemplate getSolrHotTemplate() throws ParserConfigurationException, SAXException, IOException {
+        return new SolrTemplate(solrClient(), "hot");
     }
 
     @Bean
@@ -105,5 +106,17 @@ public class BootConfig {
         SolrHotRepository solrHotRepository = new SolrHotRepository();
         solrHotRepository.setSolrOperations(solrHotTemplate);
         return solrHotRepository;
+    }
+
+    private SolrClient solrClient() throws IOException, SAXException, ParserConfigurationException {
+        //采用内置服务器
+//        CoreContainer coreContainer =  CoreContainer.createAndLoad();
+//        EmbeddedSolrServer embeddedSolrServer =   new EmbeddedSolrServer(coreContainer,"");
+//        embeddedSolrServer.get
+
+//        EmbeddedSolrServerFactory factory = new EmbeddedSolrServerFactory("classpath:com/acme/solr");
+//        return factory.getSolrClient();
+
+        return  new HttpSolrClient(commonConfigService.getSolrServerUrl());
     }
 }

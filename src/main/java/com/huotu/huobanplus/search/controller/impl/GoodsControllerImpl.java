@@ -34,9 +34,13 @@ public class GoodsControllerImpl implements GoodsController {
     private HotService hotService;
 
     @Override
-    public ViewGoodsList search(@RequestParam(value = "customerId") Long customerId, @RequestParam(value = "pageSize", required = false) Integer pageSize, @RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "levelId", required = false) Integer levelId, @RequestParam(value = "key", required = false) String key, @RequestParam(value = "brandsId", required = false) Integer brandsId, @RequestParam(value = "categoryId", required = false) Integer categoryId, @RequestParam(value = "hotspot", required = false) String hotspot, @RequestParam(value = "sorts", required = false) Integer sorts) {
+    public ViewGoodsList search(@RequestParam(value = "customerId") Long customerId, @RequestParam(value = "pageSize", required = false) Integer pageSize
+            , @RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "levelId", required = false) Integer levelId
+            , @RequestParam(value = "key", required = false) String key, @RequestParam(value = "brandsId", required = false) String brands
+            , @RequestParam(value = "categoryId", required = false) String category, @RequestParam(value = "hotspot", required = false) String hotspot
+            , @RequestParam(value = "sorts", required = false) Integer sorts) {
         key = hotService.filterSearchKey(key);
-        ViewGoodsList result = goodsService.search(customerId, pageSize, page, levelId, key, brandsId, categoryId, hotspot, sorts);
+        ViewGoodsList result = goodsService.search(customerId, pageSize, page, levelId, key, brands, category, hotspot, sorts);
         //save hot
         hotService.save(customerId, key);
         return result;

@@ -37,4 +37,14 @@ public class ViewGoods {
      * 图片地址
      */
     private String pictureUrl;
+
+    /***
+     * 概述
+     */
+    private String summary;
+
+    /**
+     * 返利价格信息
+     */
+    private String priceDesc;
 }

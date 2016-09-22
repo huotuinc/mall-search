@@ -18,9 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -42,14 +39,14 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Override
     public ViewGoodsList search(Long customerId, Integer pageSize, Integer page, Integer levelId
-            , String key, Integer brandsId, Integer categoryId, String hotspot, Integer sorts) {
+            , String key, String brands, String category, String hotspot, Integer sorts) {
         //todo  think levelId
         //data check
         if (customerId == null) throw new IllegalArgumentException();
         if (pageSize == null || pageSize <= 0) pageSize = 10;
         if (page == null || page <= 0) page = 0;
 
-        Page<Goods> goodses = solrGoodsRepository.search(customerId, pageSize, page, levelId, key, brandsId, categoryId, hotspot, sorts);
+        Page<Goods> goodses = solrGoodsRepository.search(customerId, pageSize, page, levelId, key, brands, category, hotspot, sorts);
 
         ViewGoodsList viewGoodsList = new ViewGoodsList();
         viewGoodsList.setPaging(new Paging(pageSize, page, goodses.getTotalElements()));
@@ -123,8 +120,8 @@ public class GoodsServiceImpl implements GoodsService {
         }
         goods.setTags(tags.toString());
 
-        if (mallGoods.getBrand() != null) goods.setBrandsId(mallGoods.getBrand().getId());
-        goods.setCategoryId(mallGoods.getCategory().getId());
+        if (mallGoods.getBrand() != null) goods.setBrands(mallGoods.getBrand().getBrandName());
+        goods.setCategory(mallGoods.getCategory().getTitle());
 
         if (mallGoods.isUseCustomSaleTags()) {
             SaleTags saleTags = mallGoods.getCustomSaleTags();

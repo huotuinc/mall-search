@@ -10,7 +10,7 @@ import java.io.IOException;
  */
 public interface GoodsService {
     ViewGoodsList search(Long customerId, Integer pageSize, Integer page, Integer levelId
-            , String key, Integer brandsId, Integer categoryId, String hotspot
+            , String key, String brands, String category, String hotspot
             , Integer sorts);
 
     void update(Long id) throws IOException;

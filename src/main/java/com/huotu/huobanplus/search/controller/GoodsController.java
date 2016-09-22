@@ -25,12 +25,12 @@ public interface GoodsController {
      * @param page 当前页 默认0第一页
      *             @param levelId 会员等级
      * @param key 搜索关键字
-     *            搜索范围：商品的标题，副标题，关键字，标签，虚拟分类，供应商 可用空格分隔 (虚拟分类暂不考虑)
+     *            搜索范围：商品的标题，副标题，关键字，标签，供应商 可用空格分隔 (虚拟分类暂不考虑)
      *            example：阿迪达斯T恤 equal to 阿迪达斯 T恤
      *            权重：按照 标题，副标题，关键字，标签，虚拟分类，供应商 顺序依次由高到低
-     * @param  brandsId 品牌Id （筛选项）
-     * @param categoryId 分类Id （筛选项）
-     * @param  hotspot 热点（正品保证、海外直采，免税闪购，七天退换，海南直发）（筛选项）
+     * @param  brands 品牌 （筛选项 ，隔开）
+     * @param category 分类 （筛选项 ，隔开）
+     * @param  hotspot 热点（正品保证，海外直采，免税闪购，七天退换，海南直发）（筛选项 ，隔开）
      * @param sorts 排序
      *              排序依据：新品，销量，价格
      *              example： 3（1代表 上架时间降序 2销量降序 3价格升序 4价格降序）（默认无）
@@ -42,8 +42,8 @@ public interface GoodsController {
             , @RequestParam(value = "page", required = false) Integer page
             , @RequestParam(value = "levelId", required = false) Integer levelId
             , @RequestParam(value = "key", required = false) String key
-            , @RequestParam(value = "brandsId", required = false) Integer brandsId
-            , @RequestParam(value = "categoryId", required = false) Integer categoryId
+            , @RequestParam(value = "brands", required = false) String brands
+            , @RequestParam(value = "category", required = false) String category
             , @RequestParam(value = "hotspot", required = false) String hotspot
             , @RequestParam(value = "sorts", required = false) Integer sorts
 

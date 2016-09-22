@@ -95,12 +95,12 @@ public class Goods {
      * 品牌Id
      */
     @Field
-    private Long brandsId;
+    private String brands;
     /***
      * 分类Id
      */
     @Field
-    private Long categoryId;
+    private String category;
     /***
      * 热点(即销售标签)
      */
