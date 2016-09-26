@@ -21,13 +21,40 @@ public class SolrGoodsRepository extends SimpleSolrRepository<Goods, Long> {
 
         Criteria criteria = new Criteria("customerId").is(customerId);
         if (!StringUtils.isEmpty(brands)) {
-            criteria = criteria.and(new Criteria("brands").is(brands));
+            Criteria criteria1 = null;
+            int count = 0;
+            for (String brandId : brands.split("|")) {
+                if (count == 0)
+                    criteria1 = new Criteria("brandsId").is(Long.parseLong(brandId));
+                else
+                    criteria1 = criteria1.or(new Criteria("brandsId").is(Long.parseLong(brandId)));
+                count++;
+            }
+            criteria = criteria.and(criteria1);
         }
         if (!StringUtils.isEmpty(category)) {
-            criteria = criteria.and(new Criteria("category").is(category));
+            Criteria criteria1 = null;
+            int count = 0;
+            for (String categoryId : category.split("|")) {
+                if (count == 0)
+                    criteria1 = new Criteria("categoryId").is(Long.parseLong(categoryId));
+                else
+                    criteria1 = criteria1.or(new Criteria("categoryId").is(Long.parseLong(categoryId)));
+                count++;
+            }
+            criteria = criteria.and(criteria1);
         }
         if (!StringUtils.isEmpty(hotspot)) {
-            criteria = criteria.and(new Criteria("hotspot").is(hotspot));
+            Criteria criteria1 = null;
+            int count = 0;
+            for (String spot : hotspot.split("|")) {
+                if (count == 0)
+                    criteria1 = new Criteria("hotspot").contains(spot);
+                else
+                    criteria1 = criteria1.or(new Criteria("hotspot").contains(spot));
+                count++;
+            }
+            criteria = criteria.and(criteria1);
         }
 
         //权重：按照 标题，副标题，关键字，标签，虚拟分类，供应商 顺序依次由高到低
@@ -47,10 +74,12 @@ public class SolrGoodsRepository extends SimpleSolrRepository<Goods, Long> {
         //defalut sort updateTime;
         //1代表 上架时间降序 2销量降序 3价格升序 4价格降序
         Sort sort = null;
-        if (sorts == 1) sort = new Sort(Sort.Direction.DESC, "updateTime");
-        if (sorts == 2) sort = new Sort(Sort.Direction.DESC, "sales");
-        if (sorts == 3) sort = new Sort(Sort.Direction.ASC, "memberPrice");
-        if (sorts == 4) sort = new Sort(Sort.Direction.DESC, "memberPrice");
+        if (sorts != null) {
+            if (sorts == 1) sort = new Sort(Sort.Direction.DESC, "updateTime");
+            if (sorts == 2) sort = new Sort(Sort.Direction.DESC, "sales");
+            if (sorts == 3) sort = new Sort(Sort.Direction.ASC, "memberPrice");
+            if (sorts == 4) sort = new Sort(Sort.Direction.DESC, "memberPrice");
+        }
 
         Pageable pageable = new SolrPageRequest(page, pageSize, sort);
         SimpleQuery query = new SimpleQuery(criteria, pageable);

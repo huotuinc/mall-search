@@ -7,6 +7,7 @@ import com.huotu.huobanplus.search.utils.PinyinUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,8 @@ public class HotServiceImpl implements HotService {
 
     @Override
     public List<String> suggest(Long customerId, String key, Integer pageSize) {
+        if (pageSize == null || pageSize <= 0) pageSize = 10;
+
         Page<Hot> hots = solrHotRepository.searchForStartsWith(customerId, key, pageSize);
         if (hots.getTotalElements() == 0) {
             hots = solrHotRepository.searchForComplex(customerId, key, pageSize);
@@ -54,7 +57,8 @@ public class HotServiceImpl implements HotService {
 
     @Override
     public String filterSearchKey(String key) {
-        key = key.replace(" ", "");
+        if (!StringUtils.isEmpty(key))
+            key = key.replace(" ", "");
         return key;
     }
 }

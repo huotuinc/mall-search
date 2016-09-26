@@ -10,7 +10,7 @@ public class SystemBoot extends AbstractAnnotationConfigDispatcherServletInitial
     protected Class<?>[] getRootConfigClasses() {
         return new Class<?>[]{
                 BootConfig.class
-//                , MvcConfig.class
+                , MvcConfig.class
         };
     }
 

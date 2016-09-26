@@ -58,6 +58,8 @@ public class GoodsServiceImpl implements GoodsService {
             viewGoods.setPictureUrl(goods.getPictureUrl());
             viewGoods.setPrice(goods.getPrice());
             viewGoods.setOriginalPrice(goods.getOriginalPrice());
+            viewGoods.setPriceDesc(goods.getPriceDesc());
+//            viewGoods.setSummary(goods.);
             viewGoodses.add(viewGoods);
         }
         viewGoodsList.setList(viewGoodses);
@@ -65,10 +67,18 @@ public class GoodsServiceImpl implements GoodsService {
         return viewGoodsList;
     }
 
+    public void update(com.huotu.huobanplus.common.entity.Goods goods) throws IOException {
+        updateSolrGoods(goods);
+    }
+
     public void update(Long id) throws IOException {
         com.huotu.huobanplus.common.entity.Goods mallGoods = goodsRestRepository.getOneByPK(id);
+        update(mallGoods);
+    }
+
+    private void updateSolrGoods(com.huotu.huobanplus.common.entity.Goods mallGoods) throws IOException {
         if (mallGoods != null) {
-            Goods goods = solrGoodsRepository.findOne(id);
+            Goods goods = solrGoodsRepository.findOne(mallGoods.getId());
             if (goods == null) {
                 goods = new Goods();
                 goods = mallGoodsToSolrGoods(mallGoods, goods);
@@ -80,9 +90,25 @@ public class GoodsServiceImpl implements GoodsService {
         }
     }
 
+    private Goods t(com.huotu.huobanplus.common.entity.Goods mallGoods) throws IOException {
+        if (mallGoods != null) {
+            Goods goods = solrGoodsRepository.findOne(mallGoods.getId());
+            if (goods == null) {
+                goods = new Goods();
+                goods = mallGoodsToSolrGoods(mallGoods, goods);
+            } else {
+                goods = mallGoodsToSolrGoods(mallGoods, goods);
+            }
+            return goods;
+        }
+        return null;
+    }
+
+
     public Goods mallGoodsToSolrGoods(com.huotu.huobanplus.common.entity.Goods mallGoods, Goods goods) throws IOException {
         goods.setId(mallGoods.getId());
-        goods.setCustomerId(mallGoods.getOwner().getId());
+        if (mallGoods.getOwner() != null) goods.setCustomerId(mallGoods.getOwner().getId());
+
         goods.setTitle(mallGoods.getTitle());
         goods.setPrice((float) mallGoods.getPrice());
         goods.setOriginalPrice((float) mallGoods.getMarketPrice());
@@ -91,7 +117,7 @@ public class GoodsServiceImpl implements GoodsService {
         if (mallGoods.getImages().size() > 0)
             goods.setPictureUrl(mallGoods.getImages().get(0).getSmallPic().getValue());
 
-        goods.setDescription(mallGoods.getDescription());
+//        goods.setDescription(mallGoods.getDescription());//todo
 
         List<GoodsKeywords> mallGoodsKeywords = goodsKeywordsRestRepository.findAllByGoodsId(mallGoods.getId());
         StringBuilder keyword = new StringBuilder();
@@ -105,23 +131,23 @@ public class GoodsServiceImpl implements GoodsService {
         }
         goods.setKeyword(keyword.toString());
 
-        if (mallGoods.getSupplier() != null)
-            goods.setSupplier(mallGoods.getSupplier().getName());
+//        if (mallGoods.getSupplier() != null)
+//            goods.setSupplier(mallGoods.getSupplier().getName());
 
-        StringBuilder tags = new StringBuilder();
-        Set<MallTag> mallTags = mallGoods.getTags();
-        if (mallTags != null) {
-            for (MallTag mallTag : mallTags) {
-                if (org.springframework.util.StringUtils.isEmpty(tags.toString()))
-                    tags.append(mallTag.getTagName());
-                else
-                    tags.append("|".concat(mallTag.getTagName()));
-            }
-        }
-        goods.setTags(tags.toString());
+//        StringBuilder tags = new StringBuilder();
+//        Set<MallTag> mallTags = mallGoods.getTags();
+//        if (mallTags != null) {
+//            for (MallTag mallTag : mallTags) {
+//                if (org.springframework.util.StringUtils.isEmpty(tags.toString()))
+//                    tags.append(mallTag.getTagName());
+//                else
+//                    tags.append("|".concat(mallTag.getTagName()));
+//            }
+//        }
+//        goods.setTags(tags.toString());
 
-        if (mallGoods.getBrand() != null) goods.setBrands(mallGoods.getBrand().getBrandName());
-        goods.setCategory(mallGoods.getCategory().getTitle());
+        if (mallGoods.getBrand() != null) goods.setBrandsId(mallGoods.getBrand().getId());
+        if (mallGoods.getCategory() != null) goods.setCategoryId(mallGoods.getCategory().getId());
 
         if (mallGoods.isUseCustomSaleTags()) {
             SaleTags saleTags = mallGoods.getCustomSaleTags();

@@ -13,5 +13,7 @@ public interface GoodsService {
             , String key, String brands, String category, String hotspot
             , Integer sorts);
 
+    void update(com.huotu.huobanplus.common.entity.Goods goods) throws IOException;
+
     void update(Long id) throws IOException;
 }

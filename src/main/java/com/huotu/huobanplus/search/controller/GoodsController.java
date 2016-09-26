@@ -5,6 +5,7 @@ import com.huotu.huobanplus.search.model.view.ViewGoodsList;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,15 +29,16 @@ public interface GoodsController {
      *            搜索范围：商品的标题，副标题，关键字，标签，供应商 可用空格分隔 (虚拟分类暂不考虑)
      *            example：阿迪达斯T恤 equal to 阿迪达斯 T恤
      *            权重：按照 标题，副标题，关键字，标签，虚拟分类，供应商 顺序依次由高到低
-     * @param  brands 品牌 （筛选项 ，隔开）
-     * @param category 分类 （筛选项 ，隔开）
-     * @param  hotspot 热点（正品保证，海外直采，免税闪购，七天退换，海南直发）（筛选项 ，隔开）
+     * @param  brands 品牌 （筛选项 品牌id |隔开）
+     * @param category 分类 （筛选项 分类id |隔开）
+     * @param  hotspot 热点（正品保证|海外直采|免税闪购|七天退换|海南直发）（筛选项 ，隔开）
      * @param sorts 排序
      *              排序依据：新品，销量，价格
      *              example： 3（1代表 上架时间降序 2销量降序 3价格升序 4价格降序）（默认无）
      * @return 商品列表
      */
     @RequestMapping(value = "/search", method = RequestMethod.GET)
+    @ResponseBody
     ViewGoodsList search(@RequestParam(value = "customerId") Long customerId
             , @RequestParam(value = "pageSize", required = false) Integer pageSize
             , @RequestParam(value = "page", required = false) Integer page
@@ -58,6 +60,7 @@ public interface GoodsController {
      * @return 搜索建议列表
      */
     @RequestMapping(value = "/suggest", method = RequestMethod.GET)
+    @ResponseBody
     List<String> suggest(@RequestParam(value = "customerId") Long customerId
             , @RequestParam(value = "pageSize", required = false) Integer pageSize
             , @RequestParam(value = "key") String key
@@ -78,5 +81,5 @@ public interface GoodsController {
             , @RequestParam(value = "updateFrequency", required = false) UpdateFrequency updateFrequency) throws IOException;
 
     @RequestMapping(value = "/test", method = RequestMethod.GET)
-    String test();
+    String test() throws IOException;
 }
