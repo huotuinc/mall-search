@@ -73,16 +73,20 @@ public class GoodsControllerImpl implements GoodsController {
     @Override
     @ResponseBody
     public String test() throws IOException {
-        Pageable pageable = new PageRequest(0, 10000);
-        Page<com.huotu.huobanplus.common.entity.Goods> goodses = goodsRestRepository.findAll(pageable);
+//        Pageable pageable = new PageRequest(0, 10000);
+//        Page<com.huotu.huobanplus.common.entity.Goods> goodses = goodsRestRepository.findAll(pageable);
+//
+//        goodses.getContent().forEach(x -> {
+//            try {
+//                goodsService.update(x);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        });
 
-        goodses.getContent().forEach(x -> {
-            try {
-                goodsService.update(x);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        Pageable pageable = new PageRequest(0, 1000000);
+        Page<com.huotu.huobanplus.common.entity.Goods> goodses = goodsRestRepository.findAll(pageable);
+        goodsService.update(goodses.getContent());
 
         return "ok";
     }

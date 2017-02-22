@@ -77,20 +77,20 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     private void updateSolrGoods(com.huotu.huobanplus.common.entity.Goods mallGoods) throws IOException {
-        if (mallGoods != null) {
-            Goods goods = solrGoodsRepository.findOne(mallGoods.getId());
-            if (goods == null) {
-                goods = new Goods();
-                goods = mallGoodsToSolrGoods(mallGoods, goods);
-                solrGoodsRepository.save(goods);
-            } else {
-                goods = mallGoodsToSolrGoods(mallGoods, goods);
-                solrGoodsRepository.save(goods);
-            }
-        }
+        Goods goods = getSolrGoods(mallGoods);
+        if (goods != null) solrGoodsRepository.save(goods);
     }
 
-    private Goods t(com.huotu.huobanplus.common.entity.Goods mallGoods) throws IOException {
+    public void update(List<com.huotu.huobanplus.common.entity.Goods> mallGoods) throws IOException {
+        List<Goods> goodsList = new ArrayList<>();
+        for (com.huotu.huobanplus.common.entity.Goods goods : mallGoods) {
+            if (goods != null) goodsList.add(getSolrGoods(goods));
+        }
+        if (goodsList.size() > 0)
+            solrGoodsRepository.save(goodsList);
+    }
+
+    private Goods getSolrGoods(com.huotu.huobanplus.common.entity.Goods mallGoods) throws IOException {
         if (mallGoods != null) {
             Goods goods = solrGoodsRepository.findOne(mallGoods.getId());
             if (goods == null) {
@@ -124,9 +124,9 @@ public class GoodsServiceImpl implements GoodsService {
         if (mallGoodsKeywords != null) {
             for (GoodsKeywords goodsKeywords : mallGoodsKeywords) {
                 if (org.springframework.util.StringUtils.isEmpty(keyword.toString()))
-                    keyword.append(goodsKeywords.getKeyword());
+                    keyword.append(goodsKeywords.getPk().getKeyword());
                 else
-                    keyword.append("|".concat(goodsKeywords.getKeyword()));
+                    keyword.append("|".concat(goodsKeywords.getPk().getKeyword()));
             }
         }
         goods.setKeyword(keyword.toString());
