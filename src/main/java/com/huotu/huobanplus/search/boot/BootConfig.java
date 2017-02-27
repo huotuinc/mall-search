@@ -4,21 +4,16 @@ import com.huotu.huobanplus.sdk.common.CommonClientSpringConfig;
 import com.huotu.huobanplus.search.repository.solr.SolrGoodsRepository;
 import com.huotu.huobanplus.search.repository.solr.SolrHotRepository;
 import com.huotu.huobanplus.search.service.CommonConfigService;
+import me.jiangcai.lib.spring.logging.LoggingConfig;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 
-import org.apache.solr.core.CoreContainer;
-import org.luffy.lib.libspring.logging.LoggingConfig;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.*;
 
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.repository.config.EnableSolrRepositories;
 
-import org.springframework.data.solr.server.support.EmbeddedSolrServerFactory;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -31,74 +26,38 @@ import java.io.IOException;
 
 @Configuration
 @ComponentScan({"com.huotu.huobanplus.search.service", "com.huotu.huobanplus.search.controller"})
-@EnableSolrRepositories(schemaCreationSupport = true, multicoreSupport = true,basePackages = "com.acme.solr")
-//@ImportResource(value = "classpath:spring-jpa.xml")
-//@EnableJpaRepositories(value = {"com.huotu.huobanplus.search.repository.jpa"})
+@EnableSolrRepositories(schemaCreationSupport = true, multicoreSupport = true)
 @Import(value = {LoggingConfig.class, CommonClientSpringConfig.class})
 public class BootConfig {
 
 
     @Autowired
     private CommonConfigService commonConfigService;
-
-//    @Bean
-//    public MulticoreSolrClientFactory solrServerFactory() {
-//        MulticoreSolrClientFactory multicoreSolrClientFactory = new MulticoreSolrClientFactory(solrClient(), "goods", "product");
-//        return multicoreSolrClientFactory;
-//    }
-
-//    @Bean
-//    public SolrClient solrClient() {
-//        SolrClient solrClient = new HttpSolrClient("http://localhost:8983/solr");
-//        return solrClient;
-//
-//        //采用内置服务器
-////        EmbeddedSolrServerFactory factory = new EmbeddedSolrServerFactory("classpath:com/acme/solr");
-////        return factory.getSolrClient();
-//    }
-
-//    @Autowired
-//    private SolrTemplate solrProductTemplate;
-//
-//    @Bean(name = "solrProductTemplate")
-//    public SolrTemplate solrProductTemplate() throws ParserConfigurationException, SAXException, IOException {
-//        SolrClient solrClient = new HttpSolrClient(commonConfigService.getSolrServerUrl());
-//        return new SolrTemplate(solrClient, "product");
-//    }
-
-
-    //
-//    @Bean
-//    public SolrProductRepository solrProductRepository() {
-//        SolrProductRepository solrProductRepository = new SolrProductRepository();
-//        solrProductRepository.setSolrOperations(solrProductTemplate);
-//        return solrProductRepository;
-//    }
-
-
     @Autowired
     private SolrTemplate solrGoodsTemplate;
+    @Autowired
+    private SolrTemplate solrHotTemplate;
 
+    //spring-data-solr多核处理暂时不支持自动获取core，目前暂时手动加载
     @Bean(name = "solrGoodsTemplate")
     public SolrTemplate solrGoodsTemplate() throws ParserConfigurationException, SAXException, IOException {
         return new SolrTemplate(solrClient(), "goods");
     }
 
+    @Bean(name = "solrHotTemplate")
+    public SolrTemplate solrHotTemplate() throws ParserConfigurationException, SAXException, IOException {
+        return new SolrTemplate(solrClient(), "hot");
+    }
+
+    private SolrClient solrClient() throws IOException, SAXException, ParserConfigurationException {
+        return new HttpSolrClient(commonConfigService.getSolrServerUrl());
+    }
 
     @Bean
     public SolrGoodsRepository solrGoodsRepository() {
         SolrGoodsRepository solrGoodsRepository = new SolrGoodsRepository();
         solrGoodsRepository.setSolrOperations(solrGoodsTemplate);
         return solrGoodsRepository;
-    }
-
-
-    @Autowired
-    private SolrTemplate solrHotTemplate;
-
-    @Bean(name = "solrHotTemplate")
-    public SolrTemplate getSolrHotTemplate() throws ParserConfigurationException, SAXException, IOException {
-        return new SolrTemplate(solrClient(), "hot");
     }
 
     @Bean
@@ -108,15 +67,5 @@ public class BootConfig {
         return solrHotRepository;
     }
 
-    private SolrClient solrClient() throws IOException, SAXException, ParserConfigurationException {
-        //采用内置服务器
-//        CoreContainer coreContainer =  CoreContainer.createAndLoad();
-//        EmbeddedSolrServer embeddedSolrServer =   new EmbeddedSolrServer(coreContainer,"");
-//        embeddedSolrServer.get
 
-//        EmbeddedSolrServerFactory factory = new EmbeddedSolrServerFactory("classpath:com/acme/solr");
-//        return factory.getSolrClient();
-
-        return  new HttpSolrClient(commonConfigService.getSolrServerUrl());
-    }
 }

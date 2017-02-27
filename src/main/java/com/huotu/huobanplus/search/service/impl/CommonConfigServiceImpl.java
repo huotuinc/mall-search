@@ -16,6 +16,6 @@ public class CommonConfigServiceImpl implements CommonConfigService {
 
     @Override
     public String getSolrServerUrl() {
-        return env.getProperty("solr.server.url", "http://localhost:8983/solr");
+        return env.getProperty("solr.server.url", "http://localhost:8080/solr");
     }
 }

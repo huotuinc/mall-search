@@ -1,6 +1,5 @@
 package com.huotu.huobanplus.search.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.huotu.huobanplus.common.entity.GoodsKeywords;
 import com.huotu.huobanplus.common.entity.MallTag;
 import com.huotu.huobanplus.common.entity.support.SaleTags;
@@ -12,12 +11,13 @@ import com.huotu.huobanplus.search.model.view.ViewGoods;
 import com.huotu.huobanplus.search.model.view.ViewGoodsList;
 import com.huotu.huobanplus.search.repository.solr.SolrGoodsRepository;
 import com.huotu.huobanplus.search.service.GoodsService;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -38,31 +38,17 @@ public class GoodsServiceImpl implements GoodsService {
     private GoodsKeywordsRestRepository goodsKeywordsRestRepository;
 
     @Override
-    public ViewGoodsList search(Long customerId, Integer pageSize, Integer page, Integer levelId
-            , String key, String brands, String category, String hotspot, Integer sorts) {
-        //todo  think levelId
-        //data check
-        if (customerId == null) throw new IllegalArgumentException();
-        if (pageSize == null || pageSize <= 0) pageSize = 10;
-        if (page == null || page <= 0) page = 0;
-
-        Page<Goods> goodses = solrGoodsRepository.search(customerId, pageSize, page, levelId, key, brands, category, hotspot, sorts);
+    public ViewGoodsList search(Long customerId, Integer pageSize, Integer pageNo
+            , String key, String brands, String category, String tags, Integer sorts) {
+        Page<Goods> goodsPage = solrGoodsRepository.search(customerId, pageSize, pageNo, key, brands, category, tags, sorts);
 
         ViewGoodsList viewGoodsList = new ViewGoodsList();
-        viewGoodsList.setPaging(new Paging(pageSize, page, goodses.getTotalElements()));
-        List<ViewGoods> viewGoodses = new ArrayList<>();
-        for (Goods goods : goodses) {
-            ViewGoods viewGoods = new ViewGoods();
-            viewGoods.setId(goods.getId());
-            viewGoods.setTitle(goods.getTitle());
-            viewGoods.setPictureUrl(goods.getPictureUrl());
-            viewGoods.setPrice(goods.getPrice());
-            viewGoods.setOriginalPrice(goods.getOriginalPrice());
-            viewGoods.setPriceDesc(goods.getPriceDesc());
-//            viewGoods.setSummary(goods.);
-            viewGoodses.add(viewGoods);
+        viewGoodsList.setPaging(new Paging(pageSize, pageNo, goodsPage.getTotalElements()));
+        Long[] ids = new Long[goodsPage.getNumberOfElements()];
+        for (int i = 0 ; i < goodsPage.getNumberOfElements() ; i++) {
+            ids[i] = goodsPage.getContent().get(i).getId();
         }
-        viewGoodsList.setList(viewGoodses);
+        viewGoodsList.setIds(ids);
 
         return viewGoodsList;
     }
@@ -93,77 +79,64 @@ public class GoodsServiceImpl implements GoodsService {
     private Goods getSolrGoods(com.huotu.huobanplus.common.entity.Goods mallGoods) throws IOException {
         if (mallGoods != null) {
             Goods goods = solrGoodsRepository.findOne(mallGoods.getId());
-            if (goods == null) {
-                goods = new Goods();
-                goods = mallGoodsToSolrGoods(mallGoods, goods);
-            } else {
-                goods = mallGoodsToSolrGoods(mallGoods, goods);
-            }
-            return goods;
+            return mallGoodsToSolrGoods(mallGoods, goods);
         }
         return null;
     }
 
 
     public Goods mallGoodsToSolrGoods(com.huotu.huobanplus.common.entity.Goods mallGoods, Goods goods) throws IOException {
+        if(goods == null){
+            goods = new Goods();
+        }
         goods.setId(mallGoods.getId());
-        if (mallGoods.getOwner() != null) goods.setCustomerId(mallGoods.getOwner().getId());
-
+        if (mallGoods.getOwner() != null) {
+            goods.setCustomerId(mallGoods.getOwner().getId());
+        }
         goods.setTitle(mallGoods.getTitle());
-        goods.setPrice((float) mallGoods.getPrice());
-        goods.setOriginalPrice((float) mallGoods.getMarketPrice());
-        goods.setMemberPrice((float) mallGoods.getPrice());//todo
-
-        if (mallGoods.getImages().size() > 0)
-            goods.setPictureUrl(mallGoods.getImages().get(0).getSmallPic().getValue());
-
-//        goods.setDescription(mallGoods.getDescription());//todo
+        if (mallGoods.getBrand() != null) {
+            goods.setBrandId(mallGoods.getBrand().getId());
+            goods.setBrandName(mallGoods.getBrand().getBrandName());
+        }
+        if (mallGoods.getCategory() != null) {
+            goods.setCategoriesId(mallGoods.getCategory().getCatPath());
+            // TODO: 2017-02-24 这里就不获取上级分类了，有需要了再作修改
+            goods.setCategoryName(mallGoods.getCategory().getTitle());
+        }
+        goods.setDescription(mallGoods.getDescription());
+        SaleTags saleTags;
+        if (mallGoods.isUseCustomSaleTags()) {
+            saleTags = mallGoods.getCustomSaleTags();
+        } else {
+            saleTags = mallGoods.getSaleTags();
+        }
+        if(saleTags != null){
+            goods.setHotspot(StringUtils.arrayToDelimitedString(saleTags.getTags(), "|"));
+        }
 
         List<GoodsKeywords> mallGoodsKeywords = goodsKeywordsRestRepository.findAllByGoodsId(mallGoods.getId());
-        StringBuilder keyword = new StringBuilder();
         if (mallGoodsKeywords != null) {
+            StringBuilder keyword = new StringBuilder("|");
             for (GoodsKeywords goodsKeywords : mallGoodsKeywords) {
-                if (org.springframework.util.StringUtils.isEmpty(keyword.toString()))
-                    keyword.append(goodsKeywords.getPk().getKeyword());
-                else
-                    keyword.append("|".concat(goodsKeywords.getPk().getKeyword()));
+                keyword.append(goodsKeywords.getPk().getKeyword()).append("|");
             }
-        }
-        goods.setKeyword(keyword.toString());
-
-//        if (mallGoods.getSupplier() != null)
-//            goods.setSupplier(mallGoods.getSupplier().getName());
-
-//        StringBuilder tags = new StringBuilder();
-//        Set<MallTag> mallTags = mallGoods.getTags();
-//        if (mallTags != null) {
-//            for (MallTag mallTag : mallTags) {
-//                if (org.springframework.util.StringUtils.isEmpty(tags.toString()))
-//                    tags.append(mallTag.getTagName());
-//                else
-//                    tags.append("|".concat(mallTag.getTagName()));
-//            }
-//        }
-//        goods.setTags(tags.toString());
-
-        if (mallGoods.getBrand() != null) goods.setBrandsId(mallGoods.getBrand().getId());
-        if (mallGoods.getCategory() != null) goods.setCategoryId(mallGoods.getCategory().getId());
-
-        if (mallGoods.isUseCustomSaleTags()) {
-            SaleTags saleTags = mallGoods.getCustomSaleTags();
-            if (saleTags != null)
-                goods.setHotspot(StringUtils.join(saleTags.getTags(), "|"));
-        } else {
-            SaleTags saleTags = mallGoods.getSaleTags();
-            if (saleTags != null)
-                goods.setHotspot(StringUtils.join(saleTags.getTags(), "|"));
+            goods.setKeyword(keyword.toString());
         }
 
+        Set<MallTag> mallTags = mallGoods.getTags();
+        if (mallTags != null && mallTags.size() > 0) {
+            StringBuilder tags = new StringBuilder("|");
+            StringBuilder tagIds = new StringBuilder("|");
+            for (MallTag mallTag : mallTags) {
+                tags.append(mallTag.getTagName()).append("|");
+                tagIds.append(mallTag.getId()).append("|");
+            }
+            goods.setTags(tags.toString());
+            goods.setTagIds(tagIds.toString());
+        }
         goods.setUpdateTime(mallGoods.getAutoMarketDate());
         goods.setSales((long) mallGoods.getSalesCount());
-
-        goods.setPriceDesc(JSON.toJSONString(mallGoods.getPricesCache()));
-        goods.setRebateDesc(JSON.toJSONString(mallGoods.getRebateConfiguration()));
+        goods.setOriginalPrice((float) mallGoods.getPrice());
         return goods;
     }
 }

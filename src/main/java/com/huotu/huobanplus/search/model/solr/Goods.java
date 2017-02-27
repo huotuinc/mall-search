@@ -3,13 +3,15 @@ package com.huotu.huobanplus.search.model.solr;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.solr.client.solrj.beans.Field;
+import org.springframework.data.rest.core.annotation.Description;
 import org.springframework.data.solr.core.mapping.Indexed;
-import org.springframework.data.solr.core.mapping.SolrDocument;
 
 import java.util.Date;
 
 /**
  * 商品表
+ * 模糊搜索字段权重：商品名称，关键字，品牌，分类名称，虚拟分类名称，副标题，热点名称。
+ * 商品排序权重：销量，价格，上架时间。
  * Created by Administrator on 2016/8/15.
  */
 
@@ -17,139 +19,83 @@ import java.util.Date;
 @Setter
 public class Goods {
 
-    /**
-     * 商品的Id
-     */
     @Field
+    @Description("商品的Id")
     private Long id;
 
-    /**
-     * 商家Id
-     */
     @Field
+    @Description("商家Id")
     private Long customerId;
 
-
-    /**
-     * 标题
-     */
     @Field
     @Indexed(boost = 1.0f)
+    @Description("标题，名称")
     private String title;
-    /**
-     * 市场价
-     */
-    @Field
-    private Float price;
-    /***
-     * 原价
-     */
-    @Field
-    private Float originalPrice;
-    /***
-     * 会员价
-     */
-    @Field
-    private Float memberPrice;
 
-    /***
-     * 图片地址
-     */
-    @Field
-    private String pictureUrl;
-
-
-    /**
-     * 商品描述(副标题)
-     */
     @Field
     @Indexed(boost = 0.9f)
-    private String description;
-    /**
-     * 关键字 用于商品搜索
-     */
+    @Description("关键字 用于商品搜索")
+    private String keyword;
+
     @Field
     @Indexed(boost = 0.8f)
-    private String keyword;
-    /***
-     * 供应商
-     */
-    @Field
-    @Indexed(boost = 0.5f)
-    private String supplier;
-    /***
-     * 标签
-     */
+    @Description("品牌名称")
+    private String brandName;
+
     @Field
     @Indexed(boost = 0.7f)
+    @Description("分类名称")
+    private String categoryName;
+
+    // TODO: 2017-02-27  这个字段还没赋值，还不太了解虚拟分类，先放着
+    @Field
+    @Indexed(boost = 0.6f)
+    @Description("虚拟分类")
+    private String virtualCategory;
+
+    @Field
+    @Indexed(boost = 0.5f)
+    @Description("标签")
     private String tags;
-//    /***
-//     * 虚拟分类
-//     */
-//    @Field
-//    @Indexed(boost = 0.6f)
-//    private String virturalCatetory;
 
+    @Field
+    @Indexed(boost = 0.4f)
+    @Description("商品描述(副标题)")
+    private String description;
 
-    /***
-     * 品牌Id
-     */
     @Field
-    private Long brandsId;
-    /***
-     * 分类Id
-     */
-    @Field
-    private Long categoryId;
-    /***
-     * 热点(即销售标签)
-     */
-    @Field
+    @Indexed(boost = 0.3f)
+    @Description("热点(即销售标签)")
     private String hotspot;
-//    /***
-//     * 正品保障
-//     */
-//    private Boolean security;
-//    /***
-//     * 海外直购
-//     */
-//    private Boolean overseas;
-//    /***
-//     * 免税
-//     */
-//    private Boolean freeTax;
-//    /***
-//     * 七天退换
-//     */
-//    private Boolean sevenDayReturn;
-//    /***
-//     * 海南直发
-//     */
-//    private Boolean hainanStraight;
 
-
-    /***
-     * 新品(上架时间)
-     */
     @Field
-    private Date updateTime;
-
-    /***
-     * 销量
-     */
-    @Field
-    private Long sales;
-
-
-    /***
-     * 价格信息
-     */
-    @Field
-    private String priceDesc;
+    @Description("品牌Id")
+    private Long brandId;
 
     /**
-     * 返利信息
+     * 商品与分类是一对一关系，但是分类存在Path，这里保存分类ID的PATH，查询时按 "|" + categoryId + "|" 模糊查询
      */
     @Field
-    private String rebateDesc;
+    @Description("分类Id")
+    private String categoriesId;
+
+    /**
+     * 
+     * 商品与标签是一对多关系，保存为字符串时前后以"|"连接；查询时按 "|" + tagId + "|" 模糊查询
+     */
+    @Field
+    @Description("标签ID")
+    private String tagIds;
+
+    @Field
+    @Description("新品(上架时间)")
+    private Date updateTime;
+
+    @Field
+    @Description("销量")
+    private Long sales;
+
+    @Field
+    @Description("原价")
+    private Float originalPrice;
 }

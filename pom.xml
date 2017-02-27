@@ -11,7 +11,7 @@
 
     <properties>
         <spring.version>4.3.2.RELEASE</spring.version>
-        <lib.version>1.11-SNAPSHOT</lib.version>
+        <lib.version>2.1-SNAPSHOT</lib.version>
         <java.version>1.8</java.version>
         <maven.compiler.plugin.version>3.3</maven.compiler.plugin.version>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
@@ -53,16 +53,9 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.luffy.lib</groupId>
-            <artifactId>libspring</artifactId>
+            <groupId>me.jiangcai.lib</groupId>
+            <artifactId>spring</artifactId>
             <version>${lib.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.luffy.lib</groupId>
-            <artifactId>libspringtest</artifactId>
-            <version>${lib.version}</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -129,13 +122,6 @@
         </dependency>
 
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.32</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>com.belerweb</groupId>
             <artifactId>pinyin4j</artifactId>
             <version>2.5.1</version>
@@ -144,7 +130,7 @@
         <dependency>
             <groupId>com.huotu.huobanplus</groupId>
             <artifactId>common-client</artifactId>
-            <version>1.5.4-SNAPSHOT</version>
+            <version>1.7.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>

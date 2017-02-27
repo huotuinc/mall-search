@@ -13,6 +13,7 @@ import java.util.List;
 @Setter
 public class ViewGoodsList {
      private  Paging paging;
+     private Long[] ids;
 
-    private List<ViewGoods> list;
+//    private List<ViewGoods> list;
 }

@@ -46,13 +46,16 @@ public class GoodsControllerImpl implements GoodsController {
 
 
     @Override
-    public ViewGoodsList search(@RequestParam(value = "customerId") Long customerId, @RequestParam(value = "pageSize", required = false) Integer pageSize
-            , @RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "levelId", required = false) Integer levelId
-            , @RequestParam(value = "key", required = false) String key, @RequestParam(value = "brandsId", required = false) String brands
-            , @RequestParam(value = "categoryId", required = false) String category, @RequestParam(value = "hotspot", required = false) String hotspot
+    public ViewGoodsList search(@RequestParam(value = "customerId") Long customerId
+            , @RequestParam(value = "pageSize", required = false) Integer pageSize
+            , @RequestParam(value = "pageNo", required = false) Integer pageNo
+            , @RequestParam(value = "key", required = false) String key
+            , @RequestParam(value = "brands", required = false) String brands
+            , @RequestParam(value = "category", required = false) String category
+            , @RequestParam(value = "tags", required = false) String tags
             , @RequestParam(value = "sorts", required = false) Integer sorts) {
         key = hotService.filterSearchKey(key);
-        ViewGoodsList result = goodsService.search(customerId, pageSize, page, levelId, key, brands, category, hotspot, sorts);
+        ViewGoodsList result = goodsService.search(customerId, pageSize, pageNo, key, brands, category, tags, sorts);
         //save hot
         if (!StringUtils.isEmpty(key)) hotService.save(customerId, key);
         return result;
@@ -73,20 +76,9 @@ public class GoodsControllerImpl implements GoodsController {
     @Override
     @ResponseBody
     public String test() throws IOException {
-//        Pageable pageable = new PageRequest(0, 10000);
-//        Page<com.huotu.huobanplus.common.entity.Goods> goodses = goodsRestRepository.findAll(pageable);
-//
-//        goodses.getContent().forEach(x -> {
-//            try {
-//                goodsService.update(x);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        });
-
         Pageable pageable = new PageRequest(0, 1000000);
-        Page<com.huotu.huobanplus.common.entity.Goods> goodses = goodsRestRepository.findAll(pageable);
-        goodsService.update(goodses.getContent());
+        Page<com.huotu.huobanplus.common.entity.Goods> goodsPage = goodsRestRepository.findAll(pageable);
+        goodsService.update(goodsPage.getContent());
 
         return "ok";
     }

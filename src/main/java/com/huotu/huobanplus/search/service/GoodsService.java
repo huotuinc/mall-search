@@ -11,9 +11,8 @@ import java.util.List;
  * Created by lgh on 2016/8/1.
  */
 public interface GoodsService {
-    ViewGoodsList search(Long customerId, Integer pageSize, Integer page, Integer levelId
-            , String key, String brands, String category, String hotspot
-            , Integer sorts);
+    ViewGoodsList search(Long customerId, Integer pageSize, Integer pageNo,
+                         String key, String brands, String category, String tags, Integer sorts);
 
     void update(com.huotu.huobanplus.common.entity.Goods goods) throws IOException;
 
