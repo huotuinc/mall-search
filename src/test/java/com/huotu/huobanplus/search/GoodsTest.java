@@ -2,7 +2,7 @@ package com.huotu.huobanplus.search;
 
 import com.huotu.huobanplus.sdk.common.repository.GoodsRestRepository;
 import com.huotu.huobanplus.search.model.solr.Goods;
-import com.huotu.huobanplus.search.model.view.ViewGoodsList;
+import com.huotu.huobanplus.search.model.view.ViewList;
 import com.huotu.huobanplus.search.repository.solr.SolrGoodsRepository;
 import com.huotu.huobanplus.search.service.GoodsService;
 import com.huotu.huobanplus.search.service.HotService;
@@ -37,6 +37,9 @@ public class GoodsTest extends BaseTest {
     private HotService hotService;
     @Autowired
     private SolrTemplate solrGoodsTemplate;
+
+    @Autowired
+    private GoodsRestRepository goodsRestRepository;
 
     private Goods goods,goods1;
 
@@ -106,7 +109,7 @@ public class GoodsTest extends BaseTest {
     @Test
     public void searchGoods() {
         //在没有搜索内容的情况下，应当为空
-        ViewGoodsList viewGoodsList = goodsService.search(customerId, 10, 0,  "电子", "", "", "", null);
+        ViewList viewGoodsList = goodsService.search(customerId, 10, 0,  "电子", "", "", "", null);
         Assert.assertEquals(0, viewGoodsList.getIds().length);
 
         //在有搜索的情况下，根据权重情况进行先后处理(完全匹配)
@@ -171,7 +174,7 @@ public class GoodsTest extends BaseTest {
         solrGoodsRepository.save(goods1);
 
         //在找到匹配的情况下 按照指定销量倒序优先
-        ViewGoodsList viewGoodsList = goodsService.search(customerId, 10, 0,  "en", "", "", "", 21);
+        ViewList viewGoodsList = goodsService.search(customerId, 10, 0,  "en", "", "", "", 21);
         Assert.assertEquals(2, viewGoodsList.getIds().length);
         Assert.assertEquals(Long.valueOf(2), viewGoodsList.getIds()[0]);
 
@@ -184,7 +187,7 @@ public class GoodsTest extends BaseTest {
 
     @Test
     public void searchGoodsWeight(){
-        ViewGoodsList viewGoodsList = goodsService.search(customerId, 10, 0,  "化妆品", "", "", "", null);
+        ViewList viewGoodsList = goodsService.search(customerId, 10, 0,  "化妆品", "", "", "", null);
         Assert.assertEquals(2, viewGoodsList.getIds().length);
         Assert.assertEquals(Long.valueOf(1), viewGoodsList.getIds()[0]);
 
@@ -210,7 +213,7 @@ public class GoodsTest extends BaseTest {
         solrGoodsRepository.save(goods1);
 
         //key brands category hotspot
-        ViewGoodsList viewGoodsList = goodsService.search(customerId, 10, 0, "化妆品", "", "2", "", 21);
+        ViewList viewGoodsList = goodsService.search(customerId, 10, 0, "化妆品", "", "2", "", 21);
         Assert.assertEquals(1, viewGoodsList.getIds().length);
         Assert.assertEquals(Long.valueOf(2), viewGoodsList.getIds()[0]);
 
@@ -278,9 +281,6 @@ public class GoodsTest extends BaseTest {
     public void testUpdate() throws IOException {
         goodsService.update(99567L);
     }
-
-    @Autowired
-    private GoodsRestRepository goodsRestRepository;
 
     @Test
     public void testImportGoods() throws IOException {

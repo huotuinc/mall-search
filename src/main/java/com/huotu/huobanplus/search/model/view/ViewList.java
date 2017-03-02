@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class ViewGoodsList {
+public class ViewList {
      private  Paging paging;
      private Long[] ids;
 

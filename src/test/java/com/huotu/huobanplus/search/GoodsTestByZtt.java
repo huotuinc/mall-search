@@ -1,7 +1,7 @@
 package com.huotu.huobanplus.search;
 
 import com.huotu.huobanplus.search.model.solr.Goods;
-import com.huotu.huobanplus.search.model.view.ViewGoodsList;
+import com.huotu.huobanplus.search.model.view.ViewList;
 import com.huotu.huobanplus.search.repository.solr.SolrGoodsRepository;
 import com.huotu.huobanplus.search.service.GoodsService;
 import org.junit.After;
@@ -108,7 +108,7 @@ public class GoodsTestByZtt extends BaseTest {
     public void searchBySearchKey() {
 
         //模糊搜索，权重从高到底依次为 商品名称，关键字，品牌，分类名称，虚拟分类名称，副标题，热点名称。
-        ViewGoodsList resultList = goodsService.search(customerId, 10, 0, searchKeyWord, null, null, null, 0);
+        ViewList resultList = goodsService.search(customerId, 10, 0, searchKeyWord, null, null, null, 0);
         assertNotNull(resultList);
         assertEquals(searchColumnNum, resultList.getIds().length);
         assertEquals(goodsWithTitle.getId(), resultList.getIds()[0]);
@@ -136,7 +136,7 @@ public class GoodsTestByZtt extends BaseTest {
         String searchBrandId = "1|2|3|4|5|6";
         String searchTagsId = "10|9|7";
 
-        ViewGoodsList resultList = goodsService.search(customerId, 10, 0, null, searchBrandId, null, null, null);
+        ViewList resultList = goodsService.search(customerId, 10, 0, null, searchBrandId, null, null, null);
         assertNotNull(resultList);
         assertEquals(1, resultList.getIds().length);
         assertEquals(goodsWithBrandId.getId(), resultList.getIds()[0]);
@@ -156,7 +156,7 @@ public class GoodsTestByZtt extends BaseTest {
     public void testBySort(){
         //按上架时间升序
         goodsList.sort(Comparator.comparing(Goods::getUpdateTime));
-        ViewGoodsList resultList = goodsService.search(customerId, 10, 0, null, null, null, null, 10);
+        ViewList resultList = goodsService.search(customerId, 10, 0, null, null, null, null, 10);
         for(int i = 0 ; i < resultList.getIds().length ; i++ ){
             assertEquals(goodsList.get(i).getId(),resultList.getIds()[i]);
         }

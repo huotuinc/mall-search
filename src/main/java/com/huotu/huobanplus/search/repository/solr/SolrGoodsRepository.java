@@ -19,15 +19,14 @@ public class SolrGoodsRepository extends SimpleSolrRepository<Goods, Long> {
 
         //模糊搜索字段权重：商品名称，关键字，品牌，分类名称，副标题，热点名称。
         if (!StringUtils.isEmpty(key)) {
-            String[] keys = key.split(" ");
-            Criteria keyCriteria = new Criteria("title").is(keys).boost(1.0f)
-                    .or(new Criteria("keyword").is(keys).boost(0.9f))
-                    .or(new Criteria("brandName").is(keys).boost(0.8f))
-                    .or(new Criteria("categoryName").is(keys).boost(0.7f))
-                    .or(new Criteria("virtualCategory").is(keys).boost(0.6f))
-                    .or(new Criteria("tags").is(keys).boost(0.5f))
-                    .or(new Criteria("description").is(keys).boost(0.4f))
-                    .or(new Criteria("hotspot").is(keys).boost(0.3f));
+            Criteria keyCriteria = new Criteria("title").is(key).boost(1.0f)
+                    .or(new Criteria("keyword").is(key).boost(0.9f))
+                    .or(new Criteria("brandName").is(key).boost(0.8f))
+                    .or(new Criteria("categoryName").is(key).boost(0.7f))
+                    .or(new Criteria("virtualCategory").is(key).boost(0.6f))
+                    .or(new Criteria("tags").is(key).boost(0.5f))
+                    .or(new Criteria("description").is(key).boost(0.4f))
+                    .or(new Criteria("hotspot").is(key).boost(0.3f));
             criteria = criteria.and(keyCriteria);
         }
         //根据品牌ID搜索
@@ -36,11 +35,11 @@ public class SolrGoodsRepository extends SimpleSolrRepository<Goods, Long> {
         }
         //根据分类ID搜索
         if (!StringUtils.isEmpty(categoryIds)) {
-            criteria = criteria.and(new Criteria("categoriesId").contains(categoryIds.split("\\|")));
+            criteria = criteria.and(new Criteria("categoriesId").is(categoryIds.split("\\|")));
         }
         //根据标签ID搜索（1商品-N标签）
         if (!StringUtils.isEmpty(tagIds)) {
-            criteria = criteria.and(new Criteria("tagIds").contains(tagIds.split("\\|")));
+            criteria = criteria.and(new Criteria("tagIds").is(tagIds.split("\\|")));
         }
 
         Pageable pageable = new SolrPageRequest(pageNo, pageSize, getSortBySortId(sorts));

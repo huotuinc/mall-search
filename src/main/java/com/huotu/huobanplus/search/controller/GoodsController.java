@@ -1,7 +1,6 @@
 package com.huotu.huobanplus.search.controller;
 
-import com.huotu.huobanplus.search.model.enums.UpdateFrequency;
-import com.huotu.huobanplus.search.model.view.ViewGoodsList;
+import com.huotu.huobanplus.search.model.view.ViewList;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,7 +41,7 @@ public interface GoodsController {
      */
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     @ResponseBody
-    ViewGoodsList search(@RequestParam(value = "customerId") Long customerId
+    ViewList search(@RequestParam(value = "customerId") Long customerId
             , @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
             , @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo
             , @RequestParam(value = "key", required = false) String key
@@ -57,7 +56,7 @@ public interface GoodsController {
      * 搜索建议
      * 在相关筛选条件下搜索关键字匹配热度最高的相关搜索词
      * @param customerId 商家Id
-     *                   @param pageSize 返回的条数
+     * @param pageSize 返回的条数
      * @param key 关键字 (可以是拼音)
      * @return 搜索建议列表
      */
@@ -72,16 +71,15 @@ public interface GoodsController {
 
     );
 
-
-    /***
+    /**
+     * 手动同步商品数据，如果 goodsId 为空则同步商户的所有数据；否则同步指定商品数据
      *
-     * @param id 商品Id
-     * @param updateFrequency 更新频率 默认
+     * @param customerId 商户ID
+     * @param goodsId    商品ID
+     * @return
      */
-    @RequestMapping(value = "/update", method = RequestMethod.POST)
-    void update(@RequestParam(value = "id") Long id
-            , @RequestParam(value = "updateFrequency", required = false) UpdateFrequency updateFrequency) throws IOException;
-
-    @RequestMapping(value = "/test", method = RequestMethod.GET)
-    String test() throws IOException;
+    @RequestMapping(value = "/updateByMerchant", method = RequestMethod.POST)
+    @ResponseBody
+    String updateByMerchantIdAndGoodsId(@RequestParam(value = "customerId") Long customerId,
+                                 @RequestParam(value = "goodsId", required = false) Long goodsId) throws IOException;
 }

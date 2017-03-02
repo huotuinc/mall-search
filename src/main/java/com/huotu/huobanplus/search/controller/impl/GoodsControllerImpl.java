@@ -1,19 +1,12 @@
 package com.huotu.huobanplus.search.controller.impl;
 
-import com.huotu.huobanplus.sdk.common.repository.GoodsRestRepository;
 import com.huotu.huobanplus.search.controller.GoodsController;
-import com.huotu.huobanplus.search.model.enums.UpdateFrequency;
-import com.huotu.huobanplus.search.model.solr.Goods;
-import com.huotu.huobanplus.search.model.view.ViewGoodsList;
+import com.huotu.huobanplus.search.model.view.ViewList;
 import com.huotu.huobanplus.search.service.GoodsService;
 import com.huotu.huobanplus.search.service.HotService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-
 
 import org.springframework.stereotype.Controller;
 
@@ -31,33 +24,29 @@ import java.util.List;
 
 @Controller
 public class GoodsControllerImpl implements GoodsController {
-
     private static Log log = LogFactory.getLog(GoodsControllerImpl.class);
 
     @Autowired
     private GoodsService goodsService;
-
-
     @Autowired
     private HotService hotService;
 
-    @Autowired
-    private GoodsRestRepository goodsRestRepository;
-
 
     @Override
-    public ViewGoodsList search(@RequestParam(value = "customerId") Long customerId
-            , @RequestParam(value = "pageSize", required = false) Integer pageSize
-            , @RequestParam(value = "pageNo", required = false) Integer pageNo
+    public ViewList search(@RequestParam(value = "customerId") Long customerId
+            , @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
+            , @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo
             , @RequestParam(value = "key", required = false) String key
             , @RequestParam(value = "brands", required = false) String brands
             , @RequestParam(value = "category", required = false) String category
             , @RequestParam(value = "tags", required = false) String tags
             , @RequestParam(value = "sorts", required = false) Integer sorts) {
         key = hotService.filterSearchKey(key);
-        ViewGoodsList result = goodsService.search(customerId, pageSize, pageNo, key, brands, category, tags, sorts);
+        ViewList result = goodsService.search(customerId, pageSize, pageNo, key, brands, category, tags, sorts);
         //save hot
-        if (!StringUtils.isEmpty(key)) hotService.save(customerId, key);
+        if (!StringUtils.isEmpty(key)) {
+            hotService.save(customerId, key);
+        }
         return result;
     }
 
@@ -67,19 +56,15 @@ public class GoodsControllerImpl implements GoodsController {
         return hotService.suggest(customerId, key, pageSize);
     }
 
-
-    @Override
-    public void update(@RequestParam(value = "id") Long id, @RequestParam(value = "updateFrequency", required = false) UpdateFrequency updateFrequency) throws IOException {
-        goodsService.update(id);
-    }
-
     @Override
     @ResponseBody
-    public String test() throws IOException {
-        Pageable pageable = new PageRequest(0, 1000000);
-        Page<com.huotu.huobanplus.common.entity.Goods> goodsPage = goodsRestRepository.findAll(pageable);
-        goodsService.update(goodsPage.getContent());
-
-        return "ok";
+    public String updateByMerchantIdAndGoodsId(@RequestParam(value = "customerId") Long customerId
+            , @RequestParam(value = "goodsId", required = false) Long goodsId) throws IOException {
+        if (goodsId == null) {
+            goodsService.updateByCustomerId(customerId);
+        } else {
+            goodsService.update(customerId, goodsId);
+        }
+        return "success";
     }
 }
