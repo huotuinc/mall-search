@@ -8,10 +8,23 @@ import org.springframework.data.solr.core.query.*;
 import org.springframework.data.solr.repository.support.SimpleSolrRepository;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+
 /**
  * Created by Administrator on 2016/8/17.
  */
 public class SolrGoodsRepository extends SimpleSolrRepository<Goods, Long> {
+
+    public Long searchMaxId(){
+        Pageable pageable = new SolrPageRequest(0, 1, new Sort(Sort.Direction.DESC,"id"));
+        SimpleQuery query = new SimpleQuery("*:*", pageable);
+        Page<Goods> maxGoods = getSolrOperations().queryForPage(query, Goods.class);
+        if(maxGoods.getNumberOfElements() == 0){
+            return 0L;
+        }else{
+            return maxGoods.getContent().get(0).getId();
+        }
+    }
 
     public Page<Goods> search(Long customerId, Integer pageSize, Integer pageNo
             , String key, String brandIds, String categoryIds, String tagIds, Integer sorts) {

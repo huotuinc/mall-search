@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 
 /**
@@ -32,10 +33,19 @@ public class ScheduleService {
     private UserRestRepository userRestRepository;
 
     //该字段用于单元测试
-    public static Long merchantId = null;
+//    public static Long merchantId = null;
+    public static Long merchantId = 4886L;
 
     public static Long goodsId = 0L;
     public static Long userId = 0L;
+
+    @PostConstruct
+    public void init() throws IOException {
+        goodsId = goodsService.maxId();
+        log.info("set start goods id :" + goodsId);
+        userId = userService.maxId();
+        log.info("set start user id : " + userId);
+    }
 
 
     /**
@@ -112,8 +122,8 @@ public class ScheduleService {
     /**
      * 每小时的第5分钟开始用户增量
      */
-    @Scheduled(cron = "0 5 * * * ?")
-//    @Scheduled(cron = "0 */10 * * * ?")
+//    @Scheduled(cron = "0 5 * * * ?")
+    @Scheduled(cron = "0 */5 * * * ?")
     public void addUsers() {
         log.info("start add users start with id:" + goodsId);
         int pageNo = 0, pageSize = Constant.PAGE_SIZE;

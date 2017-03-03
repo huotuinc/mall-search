@@ -24,7 +24,7 @@ public class UserControllerImpl implements UserController {
     @Autowired
     private UserService userService;
 
-    @RequestMapping(value = "/search", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/search", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
     @Override
     public ViewList search(@RequestParam(value = "customerId") Long customerId
@@ -38,25 +38,24 @@ public class UserControllerImpl implements UserController {
             , @RequestParam(value = "maxIntegral", required = false) Integer maxIntegral
             , @RequestParam(value = "txtBeginTime", required = false) String txtBeginTime
             , @RequestParam(value = "txtEndTime", required = false) String txtEndTime
-            , @RequestParam(value = "mobileBindRequired", required = false) Boolean mobileBindRequired
             , @RequestParam(value = "diyTags", required = false) String diyTags
             , @RequestParam(value = "sortType", defaultValue = "0") Integer sortType
             , @RequestParam(value = "sortDir", defaultValue = "1") Integer sortDir) {
 
         ViewList result = userService.search(customerId, pageSize, pageNo
-                , levelId, userType
+                , getLevelId(levelId), userType
                 , getSearchColumnFromSearchType(searchType), getSearchColumnFromFuzzySearchType(searchType), searchValue
                 , minIntegral, maxIntegral, getBeginDateFromString(txtBeginTime), getEndDateFromString(txtEndTime)
-                , mobileBindRequired, diyTags,
+                , isMobileBindRequired(levelId), diyTags,
                 getSortColumnFromSortType(sortType), getSortDirect(sortDir));
         return result;
     }
 
     @Override
     public String updateByMerchantIdAndGoodsId(@RequestParam(value = "customerId") Long customerId, @RequestParam(value = "userId", required = false) Long userId) throws IOException {
-        if(userId == null){
+        if (userId == null) {
             userService.updateByCustomerId(customerId);
-        }else{
+        } else {
             userService.update(userId);
         }
         return "success";
@@ -81,7 +80,7 @@ public class UserControllerImpl implements UserController {
         return searchColumn;
     }
 
-    private String getSearchColumnFromFuzzySearchType(Integer fuzzySearchType){
+    private String getSearchColumnFromFuzzySearchType(Integer fuzzySearchType) {
         if (fuzzySearchType == null) {
             return null;
         }
@@ -123,7 +122,7 @@ public class UserControllerImpl implements UserController {
         return date;
     }
 
-    private Date getEndDateFromString(String dateStr){
+    private Date getEndDateFromString(String dateStr) {
         Date date = null;
         if (StringUtils.isNotEmpty(dateStr)) {
             dateStr += ".999";
@@ -138,5 +137,27 @@ public class UserControllerImpl implements UserController {
             sortDirect = Sort.Direction.ASC;
         }
         return sortDirect;
+    }
+
+    private Integer getLevelId(Integer levelId) {
+        if (levelId != null && levelId > 0) {
+            return levelId;
+        } else {
+            return null;
+        }
+    }
+
+    private Boolean isMobileBindRequired(Integer levelId) {
+        if (levelId == null) {
+            return null;
+        }
+        switch (levelId) {
+            case -102:
+                return true;
+            case -103:
+                return false;
+            default:
+                return null;
+        }
     }
 }

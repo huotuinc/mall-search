@@ -39,7 +39,7 @@ public interface GoodsController {
      *              30代表 价格升序 31价格降序
      * @return 商品主键列表
      */
-    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    @RequestMapping(value = "/search", method = RequestMethod.POST)
     @ResponseBody
     ViewList search(@RequestParam(value = "customerId") Long customerId
             , @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize

@@ -40,7 +40,10 @@ public class GoodsServiceImpl implements GoodsService {
         Page<Goods> goodsPage = solrGoodsRepository.search(customerId, pageSize, pageNo, key, brands, category, tags, sorts);
 
         ViewList viewGoodsList = new ViewList();
-        viewGoodsList.setPaging(new Paging(pageSize, pageNo, goodsPage.getTotalElements()));
+        viewGoodsList.setPageSize(pageSize);
+        viewGoodsList.setPage(pageNo);
+        viewGoodsList.setRecordCount(goodsPage.getTotalElements());
+//        viewGoodsList.setPaging(new Paging(pageSize, pageNo, goodsPage.getTotalElements()));
         Long[] ids = new Long[goodsPage.getNumberOfElements()];
         for (int i = 0; i < goodsPage.getNumberOfElements(); i++) {
             ids[i] = goodsPage.getContent().get(i).getId();
@@ -48,6 +51,11 @@ public class GoodsServiceImpl implements GoodsService {
         viewGoodsList.setIds(ids);
 
         return viewGoodsList;
+    }
+
+    @Override
+    public Long maxId() throws IOException {
+        return solrGoodsRepository.searchMaxId();
     }
 
     public void update(Long id) throws IOException {

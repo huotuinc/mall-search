@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -189,6 +190,11 @@ public class GoodsTestByZtt extends BaseTest {
             assertEquals(goodsList.get(i).getId(),resultList.getIds()[i]);
         }
 
+    }
+
+    @Test
+    public void testGetMaxId() throws IOException {
+        System.out.println(goodsService.maxId());
     }
 
 

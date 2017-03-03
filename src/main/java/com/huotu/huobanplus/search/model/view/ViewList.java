@@ -12,7 +12,19 @@ import java.util.List;
 @Getter
 @Setter
 public class ViewList {
-     private  Paging paging;
+     /***
+      * 每页尺寸
+      */
+     private Integer pageSize;
+     /***
+      * 当前页（默认0）
+      */
+     private Integer page;
+     /***
+      * 总记录数
+      */
+     private Long recordCount;
+//     private  Paging paging;
      private Long[] ids;
 
 //    private List<ViewGoods> list;

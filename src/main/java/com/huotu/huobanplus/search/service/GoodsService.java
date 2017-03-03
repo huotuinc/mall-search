@@ -13,6 +13,8 @@ public interface GoodsService {
     ViewList search(Long customerId, Integer pageSize, Integer pageNo,
                     String key, String brands, String category, String tags, Integer sorts);
 
+    Long maxId() throws IOException;
+
     void update(Goods goods) throws IOException;
 
     void update(Long id) throws IOException;

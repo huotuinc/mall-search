@@ -20,6 +20,8 @@ public interface UserService {
             , Boolean mobileBindRequired, String diyTags
             , String sortColumn, Sort.Direction sortDirect);
 
+    Long maxId();
+
     void update(Long userId) throws IOException;
 
     void updateByCustomerId(Long customerId) throws IOException;

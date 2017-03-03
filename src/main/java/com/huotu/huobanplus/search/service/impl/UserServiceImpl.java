@@ -49,7 +49,9 @@ public class UserServiceImpl implements UserService {
                 , mobileBindRequired, diyTags, sortColumn, sortDirect);
 
         ViewList viewGoodsList = new ViewList();
-        viewGoodsList.setPaging(new Paging(pageSize, pageNo, userPage.getTotalElements()));
+        viewGoodsList.setPageSize(pageSize);
+        viewGoodsList.setPage(pageNo);
+        viewGoodsList.setRecordCount(userPage.getTotalElements());
         Long[] ids = new Long[userPage.getNumberOfElements()];
         for (int i = 0; i < userPage.getNumberOfElements(); i++) {
             ids[i] = userPage.getContent().get(i).getId();
@@ -57,6 +59,11 @@ public class UserServiceImpl implements UserService {
         viewGoodsList.setIds(ids);
 
         return viewGoodsList;
+    }
+
+    @Override
+    public Long maxId() {
+        return solrUserRepository.searchMaxId();
     }
 
     @Override
@@ -137,8 +144,8 @@ public class UserServiceImpl implements UserService {
             solrUser.setParentLoginName(parentUser.getLoginName());
         }
         solrUser.setMobileBindRequired(mallUser.isMobileBindRequired());
-        if (StringUtils.isNotEmpty(mallUser.getNickName())) {
-            solrUser.setNickName(mallUser.getNickName());
+        if (StringUtils.isNotEmpty(mallUser.getWxNickName())) {
+            solrUser.setNickName(mallUser.getWxNickName());
         } else {
             solrUser.setNickName(mallUser.getLoginName());
         }

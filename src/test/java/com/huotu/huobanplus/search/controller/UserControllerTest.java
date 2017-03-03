@@ -37,20 +37,20 @@ public class UserControllerTest extends BaseTest {
         solrUserRepository.save(mockUser);
         String controllerUrl = baseUrl + "/search";
         //根据会员类型搜索
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paging.recordCount").value(1))
                 .andReturn();
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(1 - mockUser.getUserType())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paging.recordCount").value(0))
                 .andReturn();
         //根据会员等级搜索
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("levelId", String.valueOf(mockUser.getLevelId())))
@@ -58,7 +58,7 @@ public class UserControllerTest extends BaseTest {
                 .andExpect(jsonPath("$.paging.recordCount").value(1))
                 .andReturn();
 
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("levelId", String.valueOf(1 + mockUser.getLevelId())))
@@ -66,8 +66,25 @@ public class UserControllerTest extends BaseTest {
                 .andExpect(jsonPath("$.paging.recordCount").value(0))
                 .andReturn();
 
+        //是否绑定手机
+        mockMvc.perform(post(controllerUrl)
+                .param("customerId", String.valueOf(customerId))
+                .param("userType", String.valueOf(mockUser.getUserType()))
+                .param("levelId", mockUser.isMobileBindRequired() ? "-102" : "-103"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.paging.recordCount").value(1))
+                .andReturn();
+
+        mockMvc.perform(post(controllerUrl)
+                .param("customerId", String.valueOf(customerId))
+                .param("userType", String.valueOf(mockUser.getUserType()))
+                .param("mobileBindRequired", String.valueOf(!mockUser.isMobileBindRequired())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.paging.recordCount").value(0))
+                .andReturn();
+
         //根据登录名搜索（精准搜索）
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("searchType", "1")
@@ -76,7 +93,7 @@ public class UserControllerTest extends BaseTest {
                 .andExpect(jsonPath("$.paging.recordCount").value(1))
                 .andReturn();
 
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("searchType", "1")
@@ -86,7 +103,7 @@ public class UserControllerTest extends BaseTest {
                 .andReturn();
 
         //根据从属小伙伴登录名搜索（精准搜索）
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("searchType", "3")
@@ -95,7 +112,7 @@ public class UserControllerTest extends BaseTest {
                 .andExpect(jsonPath("$.paging.recordCount").value(1))
                 .andReturn();
 
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("searchType", "3")
@@ -105,7 +122,7 @@ public class UserControllerTest extends BaseTest {
                 .andReturn();
 
         //根据openId搜索（精准搜索）
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("searchType", "5")
@@ -114,7 +131,7 @@ public class UserControllerTest extends BaseTest {
                 .andExpect(jsonPath("$.paging.recordCount").value(1))
                 .andReturn();
 
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("searchType", "5")
@@ -124,7 +141,7 @@ public class UserControllerTest extends BaseTest {
                 .andReturn();
 
         //根据姓名搜索（模糊搜索）
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("searchType", "2")
@@ -133,7 +150,7 @@ public class UserControllerTest extends BaseTest {
                 .andExpect(jsonPath("$.paging.recordCount").value(1))
                 .andReturn();
 
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("searchType", "2")
@@ -143,7 +160,7 @@ public class UserControllerTest extends BaseTest {
                 .andReturn();
 
         //根据昵称搜索（模糊搜索）
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("searchType", "4")
@@ -152,7 +169,7 @@ public class UserControllerTest extends BaseTest {
                 .andExpect(jsonPath("$.paging.recordCount").value(1))
                 .andReturn();
 
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("searchType", "4")
@@ -161,46 +178,29 @@ public class UserControllerTest extends BaseTest {
                 .andExpect(jsonPath("$.paging.recordCount").value(1))
                 .andReturn();
 
-        //是否绑定手机
-        mockMvc.perform(get(controllerUrl)
-                .param("customerId", String.valueOf(customerId))
-                .param("userType", String.valueOf(mockUser.getUserType()))
-                .param("mobileBindRequired", String.valueOf(mockUser.isMobileBindRequired())))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.paging.recordCount").value(1))
-                .andReturn();
-
-        mockMvc.perform(get(controllerUrl)
-                .param("customerId", String.valueOf(customerId))
-                .param("userType", String.valueOf(mockUser.getUserType()))
-                .param("mobileBindRequired", String.valueOf(!mockUser.isMobileBindRequired())))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.paging.recordCount").value(0))
-                .andReturn();
-
         //会员标签搜索
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("diyTags", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paging.recordCount").value(1))
                 .andReturn();
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("diyTags", "1|3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paging.recordCount").value(1))
                 .andReturn();
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("diyTags", "1|5"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paging.recordCount").value(1))
                 .andReturn();
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("diyTags", "5"))
@@ -209,21 +209,21 @@ public class UserControllerTest extends BaseTest {
                 .andReturn();
 
         //积分区间搜索
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("minIntegral", String.valueOf(mockUser.getUserIntegral() - 1)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paging.recordCount").value(1))
                 .andReturn();
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("minIntegral", String.valueOf(mockUser.getUserIntegral())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paging.recordCount").value(1))
                 .andReturn();
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("minIntegral", String.valueOf(mockUser.getUserIntegral() + 1)))
@@ -231,21 +231,21 @@ public class UserControllerTest extends BaseTest {
                 .andExpect(jsonPath("$.paging.recordCount").value(0))
                 .andReturn();
 
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("maxIntegral", String.valueOf(mockUser.getUserIntegral() - 1)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paging.recordCount").value(0))
                 .andReturn();
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("maxIntegral", String.valueOf(mockUser.getUserIntegral())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paging.recordCount").value(1))
                 .andReturn();
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("maxIntegral", String.valueOf(mockUser.getUserIntegral() + 1)))
@@ -262,21 +262,21 @@ public class UserControllerTest extends BaseTest {
         String beforeRegTime = sf.format(regTime.getTime());
         regTime.set(Calendar.DATE, regTime.get(Calendar.DATE) + 2);
         String afterRegTime = sf.format(regTime.getTime());
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("txtBeginTime", beforeRegTime))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paging.recordCount").value(1))
                 .andReturn();
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("txtBeginTime", regTimeStr))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paging.recordCount").value(1))
                 .andReturn();
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("txtBeginTime", afterRegTime))
@@ -284,21 +284,21 @@ public class UserControllerTest extends BaseTest {
                 .andExpect(jsonPath("$.paging.recordCount").value(0))
                 .andReturn();
 
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("txtEndTime", beforeRegTime))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paging.recordCount").value(0))
                 .andReturn();
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("txtEndTime", regTimeStr))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paging.recordCount").value(1))
                 .andReturn();
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("userType", String.valueOf(mockUser.getUserType()))
                 .param("txtEndTime", afterRegTime))
@@ -319,14 +319,14 @@ public class UserControllerTest extends BaseTest {
 
         //默认根据注册时间降序
         userList.sort((user1,user2)->user2.getRegTime().compareTo(user1.getRegTime()));
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paging.recordCount").value(userList.size()))
                 .andExpect(jsonPath("$.ids[0]").value(userList.get(0).getId().intValue()))
                 .andExpect(jsonPath("$.ids[" + (userList.size() - 1)+ "]").value(userList.get(userList.size() - 1).getId().intValue()))
                 .andReturn();
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("sortType", "0")
                 .param("sortDir", "1"))
@@ -335,7 +335,7 @@ public class UserControllerTest extends BaseTest {
                 .andExpect(jsonPath("$.ids[0]").value(userList.get(0).getId().intValue()))
                 .andExpect(jsonPath("$.ids[" + (userList.size() - 1)+ "]").value(userList.get(userList.size() - 1).getId().intValue()))
                 .andReturn();
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("sortType", "999")
                 .param("sortDir", "999"))
@@ -344,7 +344,7 @@ public class UserControllerTest extends BaseTest {
                 .andExpect(jsonPath("$.ids[0]").value(userList.get(0).getId().intValue()))
                 .andExpect(jsonPath("$.ids[" + (userList.size() - 1)+ "]").value(userList.get(userList.size() - 1).getId().intValue()))
                 .andReturn();
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("sortType", "0")
                 .param("sortDir", "0"))
@@ -356,7 +356,7 @@ public class UserControllerTest extends BaseTest {
 
         //根据积分排序
         userList.sort((user1,user2)->user2.getUserIntegral().compareTo(user1.getUserIntegral()));
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("sortType", "1")
                 .param("sortDir", "1"))
@@ -365,7 +365,7 @@ public class UserControllerTest extends BaseTest {
                 .andExpect(jsonPath("$.ids[0]").value(userList.get(0).getId().intValue()))
                 .andExpect(jsonPath("$.ids[" + (userList.size() - 1)+ "]").value(userList.get(userList.size() - 1).getId().intValue()))
                 .andReturn();
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("sortType", "1")
                 .param("sortDir", "0"))
@@ -377,7 +377,7 @@ public class UserControllerTest extends BaseTest {
 
         //根据余额排序
         userList.sort((user1,user2)->user2.getUserBalance().compareTo(user1.getUserBalance()));
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("sortType", "2")
                 .param("sortDir", "1"))
@@ -386,7 +386,7 @@ public class UserControllerTest extends BaseTest {
                 .andExpect(jsonPath("$.ids[0]").value(userList.get(0).getId().intValue()))
                 .andExpect(jsonPath("$.ids[" + (userList.size() - 1)+ "]").value(userList.get(userList.size() - 1).getId().intValue()))
                 .andReturn();
-        mockMvc.perform(get(controllerUrl)
+        mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId))
                 .param("sortType", "2")
                 .param("sortDir", "0"))

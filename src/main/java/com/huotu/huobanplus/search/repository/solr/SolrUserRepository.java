@@ -17,6 +17,17 @@ import java.util.Date;
  */
 public class SolrUserRepository extends SimpleSolrRepository<User, Long> {
 
+    public Long searchMaxId() {
+        Pageable pageable = new SolrPageRequest(0, 1, new Sort(Sort.Direction.DESC, "id"));
+        SimpleQuery query = new SimpleQuery("*:*", pageable);
+        Page<User> maxGoods = getSolrOperations().queryForPage(query, User.class);
+        if (maxGoods.getNumberOfElements() == 0) {
+            return 0L;
+        } else {
+            return maxGoods.getContent().get(0).getId();
+        }
+    }
+
     public Page<User> search(Long customerId, Integer pageSize, Integer pageNo
             , Integer levelId, Integer userType
             , String searchColumn, String fuzzySearchColumn, String searchValue
@@ -38,10 +49,10 @@ public class SolrUserRepository extends SimpleSolrRepository<User, Long> {
         if (StringUtils.isNotEmpty(diyTags)) {
             criteria = criteria.and(new Criteria("diyTagIds").is(diyTags));
         }
-        if (minIntegral != null) {
+        if (minIntegral != null && minIntegral != -1) {
             criteria = criteria.and(new Criteria("userIntegral").greaterThanEqual(minIntegral));
         }
-        if (maxIntegral != null) {
+        if (maxIntegral != null && maxIntegral != -1) {
             criteria = criteria.and(new Criteria("userIntegral").lessThanEqual(maxIntegral));
         }
         if (searchBeginTime != null) {
