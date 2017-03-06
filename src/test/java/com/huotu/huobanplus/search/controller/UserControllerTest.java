@@ -393,8 +393,17 @@ public class UserControllerTest extends BaseTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paging.recordCount").value(userList.size()))
                 .andExpect(jsonPath("$.ids[0]").value(userList.get(userList.size() - 1).getId().intValue()))
-                .andExpect(jsonPath("$.ids[" + (userList.size() - 1)+ "]").value(userList.get(0).getId().intValue()))
-                .andReturn();
+                .andExpect(jsonPath("$.ids[" + (userList.size() - 1)+ "]").value(userList.get(0).getId().intValue()));
+    }
+
+    @Test
+    public void testUpdateUserId() throws Exception {
+        String controllerUrl = baseUrl + "/updateByMerchant";
+        mockMvc.perform(post(controllerUrl)
+                .param("customerId","4886")
+                .param("userId","1057699"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value("success"));
     }
 
 }

@@ -53,14 +53,17 @@ public class GoodsControllerImpl implements GoodsController {
         return result;
     }
 
+    @RequestMapping(value = "/suggest", method = RequestMethod.GET)
+    @ResponseBody
     @Override
     public List<String> suggest(@RequestParam(value = "customerId") Long customerId, @RequestParam(value = "pageSize", required = false) Integer pageSize, @RequestParam(value = "key") String key) {
         key = hotService.filterSearchKey(key);
         return hotService.suggest(customerId, key, pageSize);
     }
 
-    @Override
+    @RequestMapping(value = "/updateByMerchant", method = RequestMethod.POST)
     @ResponseBody
+    @Override
     public String updateByMerchantIdAndGoodsId(@RequestParam(value = "customerId") Long customerId
             , @RequestParam(value = "goodsId", required = false) Long goodsId) throws IOException {
         if (goodsId == null) {

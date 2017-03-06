@@ -20,6 +20,7 @@ import java.util.Date;
  * Created by helloztt on 2017-02-28.
  */
 @Controller
+@RequestMapping("/user")
 public class UserControllerImpl implements UserController {
     @Autowired
     private UserService userService;
@@ -51,6 +52,8 @@ public class UserControllerImpl implements UserController {
         return result;
     }
 
+    @RequestMapping(value = "/updateByMerchant", method = RequestMethod.POST)
+    @ResponseBody
     @Override
     public String updateByMerchantIdAndGoodsId(@RequestParam(value = "customerId") Long customerId, @RequestParam(value = "userId", required = false) Long userId) throws IOException {
         if (userId == null) {
