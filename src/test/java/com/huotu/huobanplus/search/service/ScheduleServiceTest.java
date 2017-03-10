@@ -52,7 +52,7 @@ public class ScheduleServiceTest extends BaseTest {
 
     @Test
     public void testAddUser() throws IOException{
-        customerId = 296L;
+        customerId = 4886L;
         solrUserRepository.deleteAll();
         long beforeCount = solrUserRepository.count();
         assertEquals(0,beforeCount);

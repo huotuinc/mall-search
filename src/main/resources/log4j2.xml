@@ -8,7 +8,7 @@
   ~ Floor 4,Block B,Wisdom E Valley,Qianmo Road,Binjiang District
   ~ 2013-2015. All rights reserved.
   -->
-<Configuration status="INFO" debug="true">
+<Configuration status="INFO">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %p [%c] %m%n"/>
