@@ -46,6 +46,24 @@ public class ScheduleService {
             merchantId = 4886L;
         }
         Constant.PAGE_SIZE = env.getProperty("com.huotu.huobanplus.search.pageSize",Integer.class,100);
+        new Thread(() -> {
+            try {
+                Thread.sleep(60*1000);
+            } catch (InterruptedException e) {
+            }
+            log.info("start goods sync");
+            syncAllGoods();
+            log.info("end goods sync");
+        }).start();
+        new Thread(() -> {
+            try {
+                Thread.sleep(60*1000);
+            } catch (InterruptedException e) {
+            }
+            log.info("start user sync");
+            syncAllUser();
+            log.info("end user sync");
+        }).start();
     }
 
 
