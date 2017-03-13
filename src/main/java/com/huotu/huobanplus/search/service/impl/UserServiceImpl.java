@@ -169,6 +169,7 @@ public class UserServiceImpl implements UserService {
             solrUser.setDiyTagIds(diyTagSb.toString());
         }
         solrUser.setRegTime(mallUser.getRegTime());
+        solrUser.setDeleted(mallUser.isDeleted());
         return solrUser;
     }
 }

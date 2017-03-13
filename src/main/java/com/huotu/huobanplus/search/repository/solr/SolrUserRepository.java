@@ -36,7 +36,7 @@ public class SolrUserRepository extends SimpleSolrRepository<User, Long> {
             , Boolean mobileBindRequired, String diyTags
             , String sortColumn, Sort.Direction sortDirect
     ) {
-        Criteria criteria = new Criteria("customerId").is(customerId);
+        Criteria criteria = new Criteria("customerId").is(customerId).and("deleted").is(false);
         if (levelId != null) {
             criteria = criteria.and(new Criteria("levelId").is(levelId));
         }

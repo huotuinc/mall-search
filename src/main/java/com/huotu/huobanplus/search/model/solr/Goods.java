@@ -98,4 +98,8 @@ public class Goods {
     @Field
     @Description("原价")
     private Float originalPrice;
+
+    @Field
+    @Description("是否可用")
+    private boolean disabled;
 }

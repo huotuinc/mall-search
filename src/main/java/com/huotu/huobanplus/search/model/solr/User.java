@@ -72,6 +72,9 @@ public class    User {
     @Description("注册时间")
     private Date regTime;
 
+    @Field
+    @Description("是否删除")
+    private boolean deleted;
 
 
 

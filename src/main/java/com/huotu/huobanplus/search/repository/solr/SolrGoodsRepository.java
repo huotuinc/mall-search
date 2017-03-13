@@ -28,7 +28,7 @@ public class SolrGoodsRepository extends SimpleSolrRepository<Goods, Long> {
 
     public Page<Goods> search(Long customerId, Integer pageSize, Integer pageNo
             , String key, String brandIds, String categoryIds, String tagIds, Integer sorts) {
-        Criteria criteria = new Criteria("customerId").is(customerId);
+        Criteria criteria = new Criteria("customerId").is(customerId).and("disabled").is(false);
 
         //模糊搜索字段权重：商品名称，关键字，品牌，分类名称，副标题，热点名称。
         if (!StringUtils.isEmpty(key)) {

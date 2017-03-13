@@ -169,6 +169,7 @@ public class GoodsServiceImpl implements GoodsService {
         goods.setUpdateTime(mallGoods.getAutoMarketDate());
         goods.setSales((long) mallGoods.getSalesCount());
         goods.setOriginalPrice((float) mallGoods.getPrice());
+        goods.setDisabled(mallGoods.isDisabled());
         return goods;
     }
 }
