@@ -18,7 +18,8 @@ import java.util.Date;
 public class SolrUserRepository extends SimpleSolrRepository<User, Long> {
 
     public Long searchMaxId() {
-        Pageable pageable = new SolrPageRequest(0, 1, new Sort(Sort.Direction.DESC, "id"));
+        //因为主键只能保存为string类型，查询最大值不准确，所以用时间替代
+        Pageable pageable = new SolrPageRequest(0, 1, new Sort(Sort.Direction.DESC, "regTime"));
         SimpleQuery query = new SimpleQuery("*:*", pageable);
         Page<User> maxGoods = getSolrOperations().queryForPage(query, User.class);
         if (maxGoods.getNumberOfElements() == 0) {
@@ -36,7 +37,7 @@ public class SolrUserRepository extends SimpleSolrRepository<User, Long> {
             , Boolean mobileBindRequired, String diyTags
             , String sortColumn, Sort.Direction sortDirect
     ) {
-        Criteria criteria = new Criteria("customerId").is(customerId).and("deleted").is(false);
+        Criteria criteria = new Criteria("customerId").is(customerId).and(new Criteria("deleted").is(false));
         if (levelId != null) {
             criteria = criteria.and(new Criteria("levelId").is(levelId));
         }

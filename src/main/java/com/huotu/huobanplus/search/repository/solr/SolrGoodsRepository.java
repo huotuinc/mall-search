@@ -16,7 +16,8 @@ import java.util.List;
 public class SolrGoodsRepository extends SimpleSolrRepository<Goods, Long> {
 
     public Long searchMaxId(){
-        Pageable pageable = new SolrPageRequest(0, 1, new Sort(Sort.Direction.DESC,"id"));
+        //因为主键只能保存为string类型，查询最大值不准确，所以用时间替代
+        Pageable pageable = new SolrPageRequest(0, 1, new Sort(Sort.Direction.DESC,"updateTime"));
         SimpleQuery query = new SimpleQuery("*:*", pageable);
         Page<Goods> maxGoods = getSolrOperations().queryForPage(query, Goods.class);
         if(maxGoods.getNumberOfElements() == 0){
@@ -28,7 +29,7 @@ public class SolrGoodsRepository extends SimpleSolrRepository<Goods, Long> {
 
     public Page<Goods> search(Long customerId, Integer pageSize, Integer pageNo
             , String key, String brandIds, String categoryIds, String tagIds, Integer sorts) {
-        Criteria criteria = new Criteria("customerId").is(customerId).and("disabled").is(false);
+        Criteria criteria = new Criteria("customerId").is(customerId).and(new Criteria("disabled").is(false));
 
         //模糊搜索字段权重：商品名称，关键字，品牌，分类名称，副标题，热点名称。
         if (!StringUtils.isEmpty(key)) {

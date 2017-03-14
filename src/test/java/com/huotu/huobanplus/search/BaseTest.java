@@ -117,6 +117,7 @@ public abstract class BaseTest extends SpringWebTest{
         user.setUserBalance(Math.abs(random.nextDouble()));
         user.setUserIntegral(Long.valueOf(Math.abs(random.nextInt(1000))));
         user.setRegTime(Jsr310Converters.LocalDateTimeToDateConverter.INSTANCE.convert(LocalDateTime.now().minusMinutes(random.nextInt(100))));
+        user.setDeleted(false);
         return user;
     }
 }

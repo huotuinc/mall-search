@@ -4,12 +4,13 @@ import com.huotu.huobanplus.common.entity.UserDiyTag;
 import com.huotu.huobanplus.sdk.common.repository.UserDiyTagRestRepository;
 import com.huotu.huobanplus.sdk.common.repository.UserRestRepository;
 import com.huotu.huobanplus.search.model.solr.User;
-import com.huotu.huobanplus.search.model.view.Paging;
 import com.huotu.huobanplus.search.model.view.ViewList;
 import com.huotu.huobanplus.search.repository.solr.SolrUserRepository;
 import com.huotu.huobanplus.search.service.UserService;
 import com.huotu.huobanplus.search.utils.Constant;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +29,7 @@ import java.util.List;
  */
 @Service
 public class UserServiceImpl implements UserService {
+    private static final Log log = LogFactory.getLog(UserServiceImpl.class);
     @Autowired
     private SolrUserRepository solrUserRepository;
     @Autowired
@@ -108,7 +110,8 @@ public class UserServiceImpl implements UserService {
             try {
                 solrUser = mallUserToSolrUser(mallUser, solrUser);
             } catch (IOException e) {
-                System.out.println(e);
+                log.error("userId:" + mallUser.getId() + "," + e);
+//                System.out.println(e);
             }
             if (solrUser != null) {
                 solrUserList.add(solrUser);
@@ -133,9 +136,6 @@ public class UserServiceImpl implements UserService {
             solrUser.setUserType(mallUser.getUserType().ordinal());
         }
         solrUser.setLoginName(mallUser.getLoginName());
-        if (mallUser.getBinding() != null) {
-            solrUser.setOpenId(mallUser.getBinding().getOpenId());
-        }
         com.huotu.huobanplus.common.entity.User parentUser = null;
         if (mallUser.getBelongOne() != null && mallUser.getBelongOne() > 0) {
             parentUser = userRestRepository.getOneByPK(mallUser.getBelongOne());
@@ -160,6 +160,11 @@ public class UserServiceImpl implements UserService {
         } else {
             solrUser.setUserIntegral(mallUser.getUserIntegral());
         }
+        solrUser.setRegTime(mallUser.getRegTime());
+        solrUser.setDeleted(mallUser.isDeleted());
+        if (mallUser.getBinding() != null) {
+            solrUser.setOpenId(mallUser.getBinding().getOpenId());
+        }
         List<UserDiyTag> diyTagList = diyTagRestRepository.findByUserId(mallUser.getId());
         if (diyTagList != null && diyTagList.size() > 0) {
             StringBuilder diyTagSb = new StringBuilder("|");
@@ -168,8 +173,6 @@ public class UserServiceImpl implements UserService {
             }
             solrUser.setDiyTagIds(diyTagSb.toString());
         }
-        solrUser.setRegTime(mallUser.getRegTime());
-        solrUser.setDeleted(mallUser.isDeleted());
         return solrUser;
     }
 }

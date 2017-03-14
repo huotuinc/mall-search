@@ -47,21 +47,21 @@ public class ScheduleService {
         }
         Constant.PAGE_SIZE = env.getProperty("com.huotu.huobanplus.search.pageSize",Integer.class,100);
         new Thread(() -> {
+            log.info("start goods sync");
             try {
                 Thread.sleep(60*1000);
+                syncAllGoods();
             } catch (InterruptedException e) {
             }
-            log.info("start goods sync");
-            syncAllGoods();
             log.info("end goods sync");
         }).start();
         new Thread(() -> {
+            log.info("start user sync");
             try {
                 Thread.sleep(60*1000);
+                syncAllUser();
             } catch (InterruptedException e) {
             }
-            log.info("start user sync");
-            syncAllUser();
             log.info("end user sync");
         }).start();
     }
@@ -81,10 +81,14 @@ public class ScheduleService {
                     break;
                 }
                 goodsService.update(goodsPage.getContent());
+                Thread.sleep(10);
             } catch (IOException e) {
                 log.error("sync goods at page " + pageNo + " error : " + e);
+            } catch (InterruptedException e) {
+                log.error("sleep error");
             }
             pageNo++;
+            log.info("sync goods pageNo:" + pageNo + " success");
         }
         log.info("end sync all goods");
     }
@@ -95,10 +99,13 @@ public class ScheduleService {
     @Scheduled(cron = "0 5 * * * ?")
 //    @Scheduled(cron = "0 */5 * * * ?")
     public void addGoods() throws IOException {
-        goodsId = goodsService.maxId();
+        if(goodsId == null || goodsId == 0){
+            goodsId = goodsService.maxId();
+        }
         log.info("set start goods id :" + goodsId);
         log.info("start add goods start with id:" + goodsId);
         int pageNo = 0, pageSize = Constant.PAGE_SIZE;
+        Long maxGoodsId = goodsId;
         while (true) {
             try {
                 Page<Goods> goodsPage = goodsRestRepository.search(goodsId, merchantId, new PageRequest(pageNo, pageSize));
@@ -106,11 +113,16 @@ public class ScheduleService {
                     break;
                 }
                 goodsService.update(goodsPage.getContent());
+                maxGoodsId = goodsPage.getContent().get(goodsPage.getNumberOfElements() - 1).getId();
+                Thread.sleep(10);
             } catch (IOException e) {
                 log.error("add goods at page " + pageNo + " error : " +e);
+            } catch (InterruptedException e) {
+                log.error("sleep error");
             }
             pageNo++;
         }
+        goodsId = maxGoodsId;
         log.info("end add goods end with id:" + goodsId);
     }
 
@@ -129,10 +141,14 @@ public class ScheduleService {
                     break;
                 }
                 userService.update(userPage.getContent());
+                Thread.sleep(10);
             } catch (IOException e) {
                 log.error("sync user at page " + pageNo + "error : "+ e);
+            } catch (InterruptedException e) {
+                log.error("sleep error");
             }
             pageNo++;
+            log.info("sync users pageNo:" + pageNo + " success");
         }
         log.info("end sync all user");
     }
@@ -143,12 +159,13 @@ public class ScheduleService {
     @Scheduled(cron = "0 5 * * * ?")
 //    @Scheduled(cron = "0 */5 * * * ?")
     public void addUsers() {
-//        if (userId == null || userId == 0) {
+        if (userId == null || userId == 0) {
             userId = userService.maxId();
-//        }
+        }
         log.info("set start user id : " + userId);
         log.info("start add users start with id:" + userId);
         int pageNo = 0, pageSize = Constant.PAGE_SIZE;
+        Long maxUserId = userId;
         while (true) {
             try {
                 Page<User> userPage = userRestRepository.search(userId, merchantId, new PageRequest(pageNo, pageSize));
@@ -156,11 +173,16 @@ public class ScheduleService {
                     break;
                 }
                 userService.update(userPage.getContent());
+                maxUserId = userPage.getContent().get(userPage.getNumberOfElements() - 1).getId();
+                Thread.sleep(10);
             } catch (IOException e) {
                 log.error("add user at page " + pageNo + " error :" + e);
+            } catch (InterruptedException e) {
+                log.error("sleep error");
             }
             pageNo++;
         }
+        userId = maxUserId;
         log.info("end add users end with id:" + userId);
     }
 }

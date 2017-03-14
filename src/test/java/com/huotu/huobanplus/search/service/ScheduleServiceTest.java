@@ -72,4 +72,10 @@ public class ScheduleServiceTest extends BaseTest {
 
     }
 
+    @Test
+    public void testMaxId(){
+        System.out.println(solrUserRepository.searchMaxId());
+        System.out.println(solrGoodsRepository.searchMaxId());
+    }
+
 }

@@ -322,7 +322,7 @@ public class UserControllerTest extends BaseTest {
         mockMvc.perform(post(controllerUrl)
                 .param("customerId", String.valueOf(customerId)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.paging.recordCount").value(userList.size()))
+                .andExpect(jsonPath("$.recordCount").value(userList.size()))
                 .andExpect(jsonPath("$.ids[0]").value(userList.get(0).getId().intValue()))
                 .andExpect(jsonPath("$.ids[" + (userList.size() - 1)+ "]").value(userList.get(userList.size() - 1).getId().intValue()))
                 .andReturn();
@@ -331,7 +331,7 @@ public class UserControllerTest extends BaseTest {
                 .param("sortType", "0")
                 .param("sortDir", "1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.paging.recordCount").value(userList.size()))
+                .andExpect(jsonPath("$.recordCount").value(userList.size()))
                 .andExpect(jsonPath("$.ids[0]").value(userList.get(0).getId().intValue()))
                 .andExpect(jsonPath("$.ids[" + (userList.size() - 1)+ "]").value(userList.get(userList.size() - 1).getId().intValue()))
                 .andReturn();
@@ -340,7 +340,7 @@ public class UserControllerTest extends BaseTest {
                 .param("sortType", "999")
                 .param("sortDir", "999"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.paging.recordCount").value(userList.size()))
+                .andExpect(jsonPath("$.recordCount").value(userList.size()))
                 .andExpect(jsonPath("$.ids[0]").value(userList.get(0).getId().intValue()))
                 .andExpect(jsonPath("$.ids[" + (userList.size() - 1)+ "]").value(userList.get(userList.size() - 1).getId().intValue()))
                 .andReturn();
@@ -349,7 +349,7 @@ public class UserControllerTest extends BaseTest {
                 .param("sortType", "0")
                 .param("sortDir", "0"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.paging.recordCount").value(userList.size()))
+                .andExpect(jsonPath("$.recordCount").value(userList.size()))
                 .andExpect(jsonPath("$.ids[0]").value(userList.get(userList.size() - 1).getId().intValue()))
                 .andExpect(jsonPath("$.ids[" + (userList.size() - 1)+ "]").value(userList.get(0).getId().intValue()))
                 .andReturn();
@@ -361,7 +361,7 @@ public class UserControllerTest extends BaseTest {
                 .param("sortType", "1")
                 .param("sortDir", "1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.paging.recordCount").value(userList.size()))
+                .andExpect(jsonPath("$.recordCount").value(userList.size()))
                 .andExpect(jsonPath("$.ids[0]").value(userList.get(0).getId().intValue()))
                 .andExpect(jsonPath("$.ids[" + (userList.size() - 1)+ "]").value(userList.get(userList.size() - 1).getId().intValue()))
                 .andReturn();
@@ -370,7 +370,7 @@ public class UserControllerTest extends BaseTest {
                 .param("sortType", "1")
                 .param("sortDir", "0"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.paging.recordCount").value(userList.size()))
+                .andExpect(jsonPath("$.recordCount").value(userList.size()))
                 .andExpect(jsonPath("$.ids[0]").value(userList.get(userList.size() - 1).getId().intValue()))
                 .andExpect(jsonPath("$.ids[" + (userList.size() - 1)+ "]").value(userList.get(0).getId().intValue()))
                 .andReturn();
@@ -382,7 +382,7 @@ public class UserControllerTest extends BaseTest {
                 .param("sortType", "2")
                 .param("sortDir", "1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.paging.recordCount").value(userList.size()))
+                .andExpect(jsonPath("$.recordCount").value(userList.size()))
                 .andExpect(jsonPath("$.ids[0]").value(userList.get(0).getId().intValue()))
                 .andExpect(jsonPath("$.ids[" + (userList.size() - 1)+ "]").value(userList.get(userList.size() - 1).getId().intValue()))
                 .andReturn();
@@ -391,7 +391,7 @@ public class UserControllerTest extends BaseTest {
                 .param("sortType", "2")
                 .param("sortDir", "0"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.paging.recordCount").value(userList.size()))
+                .andExpect(jsonPath("$.recordCount").value(userList.size()))
                 .andExpect(jsonPath("$.ids[0]").value(userList.get(userList.size() - 1).getId().intValue()))
                 .andExpect(jsonPath("$.ids[" + (userList.size() - 1)+ "]").value(userList.get(0).getId().intValue()));
     }
