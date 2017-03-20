@@ -54,12 +54,13 @@ public class UserServiceImpl implements UserService {
         viewGoodsList.setPageSize(pageSize);
         viewGoodsList.setPage(pageNo);
         viewGoodsList.setRecordCount(userPage.getTotalElements());
-        Long[] ids = new Long[userPage.getNumberOfElements()];
-        for (int i = 0; i < userPage.getNumberOfElements(); i++) {
-            ids[i] = userPage.getContent().get(i).getId();
+        if(userPage.getNumberOfElements() > 0){
+            Long[] ids = new Long[userPage.getNumberOfElements()];
+            for (int i = 0; i < userPage.getNumberOfElements(); i++) {
+                ids[i] = userPage.getContent().get(i).getId();
+            }
+            viewGoodsList.setIds(ids);
         }
-        viewGoodsList.setIds(ids);
-
         return viewGoodsList;
     }
 

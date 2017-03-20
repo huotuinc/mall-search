@@ -4,7 +4,9 @@ import com.huotu.huobanplus.common.utils.DateUtil;
 import com.huotu.huobanplus.search.controller.UserController;
 import com.huotu.huobanplus.search.model.view.ViewList;
 import com.huotu.huobanplus.search.service.UserService;
+import com.huotu.huobanplus.search.utils.ToolUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 /**
  * Created by helloztt on 2017-02-28.
@@ -46,7 +49,7 @@ public class UserControllerImpl implements UserController {
         ViewList result = userService.search(customerId, pageSize, pageNo
                 , getLevelId(levelId), userType
                 , getSearchColumnFromSearchType(searchType), getSearchColumnFromFuzzySearchType(searchType), searchValue
-                , minIntegral, maxIntegral, getBeginDateFromString(txtBeginTime), getEndDateFromString(txtEndTime)
+                , minIntegral, maxIntegral, ToolUtils.getDateFromString(txtBeginTime), ToolUtils.getTomorrowDate(txtEndTime)
                 , isMobileBindRequired(levelId), diyTags,
                 getSortColumnFromSortType(sortType), getSortDirect(sortDir));
         return result;
@@ -55,7 +58,7 @@ public class UserControllerImpl implements UserController {
     @RequestMapping(value = "/updateByMerchant", method = RequestMethod.POST)
     @ResponseBody
     @Override
-    public String updateByMerchantIdAndGoodsId(@RequestParam(value = "customerId") Long customerId, @RequestParam(value = "userId", required = false) Long userId) throws IOException {
+    public String updateByMerchantIdAndUserId(@RequestParam(value = "customerId") Long customerId, @RequestParam(value = "userId", required = false) Long userId) throws IOException {
         if (userId == null) {
             userService.updateByCustomerId(customerId);
         } else {
@@ -115,23 +118,6 @@ public class UserControllerImpl implements UserController {
                 sortColumn = "regTime";
         }
         return sortColumn;
-    }
-
-    private Date getBeginDateFromString(String dateStr) {
-        Date date = null;
-        if (StringUtils.isNotEmpty(dateStr)) {
-            date = DateUtil.parse(dateStr, DateUtil.DATETIME_FORMAT);
-        }
-        return date;
-    }
-
-    private Date getEndDateFromString(String dateStr) {
-        Date date = null;
-        if (StringUtils.isNotEmpty(dateStr)) {
-            dateStr += ".999";
-            date = DateUtil.parse(dateStr, DateUtil.DATETIME_FORMAT + ".SSS");
-        }
-        return date;
     }
 
     private Sort.Direction getSortDirect(Integer sortDir) {

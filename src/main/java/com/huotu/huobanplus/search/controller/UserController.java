@@ -64,6 +64,6 @@ public interface UserController {
      */
     @RequestMapping(value = "/updateByMerchant", method = RequestMethod.POST)
     @ResponseBody
-    String updateByMerchantIdAndGoodsId(@RequestParam(value = "customerId") Long customerId,
-                                        @RequestParam(value = "userId", required = false) Long userId) throws IOException;
+    String updateByMerchantIdAndUserId(@RequestParam(value = "customerId") Long customerId,
+                                       @RequestParam(value = "userId", required = false) Long userId) throws IOException;
 }

@@ -25,7 +25,7 @@ public class ViewList {
       */
      private Long recordCount;
 //     private  Paging paging;
-     private Long[] ids;
+     private Object[] ids;
 
 //    private List<ViewGoods> list;
 }

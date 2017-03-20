@@ -1,8 +1,10 @@
 package com.huotu.huobanplus.search.service;
 
 import com.huotu.huobanplus.common.entity.Goods;
+import com.huotu.huobanplus.common.entity.Order;
 import com.huotu.huobanplus.common.entity.User;
 import com.huotu.huobanplus.sdk.common.repository.GoodsRestRepository;
+import com.huotu.huobanplus.sdk.common.repository.OrdersRestRepository;
 import com.huotu.huobanplus.sdk.common.repository.UserRestRepository;
 import com.huotu.huobanplus.search.utils.Constant;
 import org.apache.commons.logging.Log;
@@ -13,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -29,14 +32,19 @@ public class ScheduleService {
     @Autowired
     private UserService userService;
     @Autowired
+    private OrderService orderService;
+    @Autowired
     private GoodsRestRepository goodsRestRepository;
     @Autowired
     private UserRestRepository userRestRepository;
+    @Autowired
+    private OrdersRestRepository ordersRestRepository;
     @Autowired
     private Environment env;
 
     public static Long goodsId = 0L;
     public static Long userId = 0L;
+    public static String orderId = "";
     //该字段用于单元测试
     public static Long merchantId = null;
 
@@ -88,7 +96,7 @@ public class ScheduleService {
                 log.error("sleep error");
             }
             pageNo++;
-            log.info("sync goods pageNo:" + pageNo + " success");
+            log.debug("sync goods pageNo:" + pageNo + " success");
         }
         log.info("end sync all goods");
     }
@@ -148,7 +156,7 @@ public class ScheduleService {
                 log.error("sleep error");
             }
             pageNo++;
-            log.info("sync users pageNo:" + pageNo + " success");
+            log.debug("sync users pageNo:" + pageNo + " success");
         }
         log.info("end sync all user");
     }
@@ -184,5 +192,63 @@ public class ScheduleService {
         }
         userId = maxUserId;
         log.info("end add users end with id:" + userId);
+    }
+
+    /**
+     * 每天0点5分开始订单全量
+     */
+    @Scheduled(cron = "0 5 0 * * ?")
+    public void syncAllOrder(){
+        log.info("start sync all order");
+        int pageNo = 0, pageSize = Constant.PAGE_SIZE;
+        while (true) {
+            try {
+                Page<Order> orderPage = ordersRestRepository.search(0L, merchantId, new PageRequest(pageNo, pageSize));
+                if (orderPage.getNumberOfElements() == 0) {
+                    break;
+                }
+                orderService.update(orderPage.getContent());
+                Thread.sleep(10);
+            } catch (IOException e) {
+                log.error("sync order at page " + pageNo + "error : "+ e);
+            } catch (InterruptedException e) {
+                log.error("sleep error");
+            }
+            pageNo++;
+            log.debug("sync order pageNo:" + pageNo + " success");
+        }
+        log.info("end sync all user");
+    }
+
+    /**
+     * 每小时的第5分钟开始订单增量
+     */
+    @Scheduled(cron = "0 5 * * * ?")
+//    @Scheduled(cron = "0 */2 * * * ?")
+    public void addOrder(){
+        if (StringUtils.isEmpty(orderId)) {
+            orderId = orderService.maxId();
+        }
+        log.info("start add order start with id:" + orderId);
+        int pageNo = 0, pageSize = Constant.PAGE_SIZE;
+        String maxOrderId = orderId;
+        while (true) {
+            try {
+                Page<Order> orderPage = ordersRestRepository.search(orderId, merchantId, new PageRequest(pageNo, pageSize));
+                if (orderPage.getNumberOfElements() == 0) {
+                    break;
+                }
+                orderService.update(orderPage.getContent());
+                maxOrderId = orderPage.getContent().get(orderPage.getNumberOfElements() - 1).getId();
+                Thread.sleep(10);
+            } catch (IOException e) {
+                log.error("add order at page " + pageNo + " error :" + e);
+            } catch (InterruptedException e) {
+                log.error("sleep error");
+            }
+            pageNo++;
+        }
+        orderId = maxOrderId;
+        log.info("end add order end with id:" + userId);
     }
 }

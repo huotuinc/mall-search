@@ -3,6 +3,7 @@ package com.huotu.huobanplus.search.boot;
 import com.huotu.huobanplus.sdk.common.CommonClientSpringConfig;
 import com.huotu.huobanplus.search.repository.solr.SolrGoodsRepository;
 import com.huotu.huobanplus.search.repository.solr.SolrHotRepository;
+import com.huotu.huobanplus.search.repository.solr.SolrOrderRepository;
 import com.huotu.huobanplus.search.repository.solr.SolrUserRepository;
 import com.huotu.huobanplus.search.service.CommonConfigService;
 import me.jiangcai.lib.spring.logging.LoggingConfig;
@@ -40,6 +41,8 @@ public class BootConfig {
     private SolrTemplate solrHotTemplate;
     @Autowired
     private SolrTemplate solrUserTemplate;
+    @Autowired
+    private SolrTemplate solrOrderTemplate;
 
     //spring-data-solr多核处理暂时不支持自动获取core，目前暂时手动加载
     @Bean(name = "solrGoodsTemplate")
@@ -55,6 +58,11 @@ public class BootConfig {
     @Bean(name = "solrUserTemplate")
     public SolrTemplate solrUserTemplate() throws ParserConfigurationException, SAXException, IOException {
         return new SolrTemplate(solrClient(),"user");
+    }
+
+    @Bean(name = "solrOrderTemplate")
+    public SolrTemplate solrOrderTemplate()  throws ParserConfigurationException, SAXException, IOException {
+        return new SolrTemplate(solrClient(),"order");
     }
 
     private SolrClient solrClient() throws IOException, SAXException, ParserConfigurationException {
@@ -80,6 +88,13 @@ public class BootConfig {
         SolrUserRepository solrUserRepository = new SolrUserRepository();
         solrUserRepository.setSolrOperations(solrUserTemplate);
         return solrUserRepository;
+    }
+
+    @Bean
+    public SolrOrderRepository solrOrderRepository(){
+        SolrOrderRepository solrOrderRepository = new SolrOrderRepository();
+        solrOrderRepository.setSolrOperations(solrOrderTemplate);
+        return solrOrderRepository;
     }
 
 

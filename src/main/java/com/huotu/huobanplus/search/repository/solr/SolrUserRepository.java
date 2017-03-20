@@ -21,11 +21,11 @@ public class SolrUserRepository extends SimpleSolrRepository<User, Long> {
         //因为主键只能保存为string类型，查询最大值不准确，所以用时间替代
         Pageable pageable = new SolrPageRequest(0, 1, new Sort(Sort.Direction.DESC, "regTime"));
         SimpleQuery query = new SimpleQuery("*:*", pageable);
-        Page<User> maxGoods = getSolrOperations().queryForPage(query, User.class);
-        if (maxGoods.getNumberOfElements() == 0) {
+        Page<User> maxUser = getSolrOperations().queryForPage(query, User.class);
+        if (maxUser.getNumberOfElements() == 0) {
             return 0L;
         } else {
-            return maxGoods.getContent().get(0).getId();
+            return maxUser.getContent().get(0).getId();
         }
     }
 
@@ -60,7 +60,7 @@ public class SolrUserRepository extends SimpleSolrRepository<User, Long> {
             criteria = criteria.and(new Criteria("regTime").greaterThanEqual(searchBeginTime));
         }
         if (searchEndTime != null) {
-            criteria = criteria.and(new Criteria("regTime").lessThanEqual(searchEndTime));
+            criteria = criteria.and(new Criteria("regTime").lessThan(searchEndTime));
         }
         if (StringUtils.isNotEmpty(searchColumn) && StringUtils.isNotEmpty(searchValue)) {
             criteria = criteria.and(new Criteria(searchColumn).is(searchValue));
