@@ -41,24 +41,24 @@ public class GoodsTest extends BaseTest {
     @Autowired
     private GoodsRestRepository goodsRestRepository;
 
-    private Goods goods,goods1;
+    private Goods goods, goods1;
 
 
     @Before
     public void init() {
         customerId = 3447L;
         goods = solrGoodsRepository.findOne(1L);
-        if(goods == null){
+        if (goods == null) {
             goods = mockGoodsByTitleAndDescription(1L, "化妆品", "");
-        }else{
+        } else {
             goods.setTitle("化妆品");
             goods.setDescription("");
         }
         solrGoodsRepository.save(goods);
         goods1 = solrGoodsRepository.findOne(2L);
-        if(goods1 == null){
+        if (goods1 == null) {
             goods1 = mockGoodsByTitleAndDescription(2L, "", "化妆品");
-        }else{
+        } else {
             goods1.setTitle("");
             goods1.setDescription("化妆品");
         }
@@ -72,35 +72,35 @@ public class GoodsTest extends BaseTest {
     }
 
     @Test
-    public void removeAll(){
+    public void removeAll() {
         solrGoodsRepository.deleteAll();
     }
 
     @Test
-    public void facetQueryTest(){
+    public void facetQueryTest() {
         FacetQuery query = new SimpleFacetQuery(new Criteria(Criteria.WILDCARD).expression(Criteria.WILDCARD))
                 .setFacetOptions(new FacetOptions().addFacetOnField("title").setFacetLimit(5));
-        FacetPage<Goods> goodsFacetPage = solrGoodsTemplate.queryForFacetPage(query,Goods.class);
+        FacetPage<Goods> goodsFacetPage = solrGoodsTemplate.queryForFacetPage(query, Goods.class);
         Assert.assertNotNull(goodsFacetPage);
         Assert.assertTrue(goodsFacetPage.getTotalElements() > 0);
 
         FacetQuery queryTitle = new SimpleFacetQuery(new SimpleStringCriteria("title:化妆品"));
-        FacetPage<Goods> queryTitlePage = solrGoodsTemplate.queryForFacetPage(queryTitle,Goods.class);
+        FacetPage<Goods> queryTitlePage = solrGoodsTemplate.queryForFacetPage(queryTitle, Goods.class);
         Assert.assertNotNull(goodsFacetPage);
         Assert.assertTrue(queryTitlePage.getTotalElements() > 0);
 
         FacetQuery queryTitle1 = new SimpleFacetQuery(new SimpleStringCriteria("title:*"));
-        FacetPage<Goods> queryTitle1Page = solrGoodsTemplate.queryForFacetPage(queryTitle1,Goods.class);
+        FacetPage<Goods> queryTitle1Page = solrGoodsTemplate.queryForFacetPage(queryTitle1, Goods.class);
         Assert.assertNotNull(queryTitle1Page);
         Assert.assertTrue(queryTitle1Page.getTotalElements() > 0);
 
         FacetQuery queryTitle2 = new SimpleFacetQuery(new SimpleStringCriteria("title:品妆化"));
-        FacetPage<Goods> queryTitle2Page = solrGoodsTemplate.queryForFacetPage(queryTitle2,Goods.class);
+        FacetPage<Goods> queryTitle2Page = solrGoodsTemplate.queryForFacetPage(queryTitle2, Goods.class);
         Assert.assertNotNull(queryTitle2Page);
         Assert.assertTrue(queryTitle2Page.getTotalElements() == 0);
 
         FacetQuery queryTitle3 = new SimpleFacetQuery(new SimpleStringCriteria("title:?品"));
-        FacetPage<Goods> queryTitle3Page = solrGoodsTemplate.queryForFacetPage(queryTitle3,Goods.class);
+        FacetPage<Goods> queryTitle3Page = solrGoodsTemplate.queryForFacetPage(queryTitle3, Goods.class);
         Assert.assertNotNull(queryTitle3Page);
         Assert.assertTrue(queryTitle3Page.getTotalElements() == 0);
     }
@@ -109,56 +109,56 @@ public class GoodsTest extends BaseTest {
     @Test
     public void searchGoods() {
         //在没有搜索内容的情况下，应当为空
-        ViewList viewGoodsList = goodsService.search(customerId, 10, 0,  "电子", "", "", "", null);
+        ViewList viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "电子", "", "", "", null);
         Assert.assertEquals(0, viewGoodsList.getIds().length);
 
         //在有搜索的情况下，根据权重情况进行先后处理(完全匹配)
-        viewGoodsList = goodsService.search(customerId, 10, 0,  "化妆品", "", "", "", null);
+        viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "化妆品", "", "", "", null);
         Assert.assertEquals(2, viewGoodsList.getIds().length);
 //        Assert.assertEquals(Long.valueOf(1), viewGoodsList.getList().get(0).getId());
 
         //完全匹配跟权重的比较 完全匹配靠前
         goods.setTitle("我有 化妆品的en公司");
         solrGoodsRepository.save(goods);
-        viewGoodsList = goodsService.search(customerId, 10, 0,  "化妆品", "", "", "", null);
+        viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "化妆品", "", "", "", null);
         Assert.assertEquals(2, viewGoodsList.getIds().length);
 //        Assert.assertEquals(Long.valueOf(1), viewGoodsList.getList().get(0).getId());
 
         //在有搜索的情况下，根据权重情况进行先后处理(非完全匹配)
         goods1.setDescription("我有 化妆品的en作坊");
         solrGoodsRepository.save(goods1);
-        viewGoodsList = goodsService.search(customerId, 10, 0,  "化妆品", "", "", "", null);
+        viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "化妆品", "", "", "", null);
         Assert.assertEquals(2, viewGoodsList.getIds().length);
 //        Assert.assertEquals(Long.valueOf(1), viewGoodsList.getList().get(0).getId());
 
         //复杂词的搜索 带特殊字符如空格
-        viewGoodsList = goodsService.search(customerId, 10, 0,  "化妆品 公司", "", "", "", null);
+        viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "化妆品 公司", "", "", "", null);
         Assert.assertEquals(2, viewGoodsList.getIds().length);
 
-        viewGoodsList = goodsService.search(customerId, 10, 0,  "弟弟化妆品的信息", "", "", "", null);
+        viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "弟弟化妆品的信息", "", "", "", null);
         Assert.assertEquals(2, viewGoodsList.getIds().length);
 //        Assert.assertEquals(Long.valueOf(1), viewGoodsList.getList().get(0).getId());
 
         //简单组合词
-        viewGoodsList = goodsService.search(customerId, 10, 0,  "化妆", "", "", "", null);
+        viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "化妆", "", "", "", null);
         Assert.assertEquals(0, viewGoodsList.getIds().length);
 //        Assert.assertEquals(Long.valueOf(1), viewGoodsList.getList().get(0).getId());
 
 
         //非搜索词
-        viewGoodsList = goodsService.search(customerId, 10, 0,  "有化", "", "", "", null);
+        viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "有化", "", "", "", null);
         Assert.assertEquals(0, viewGoodsList.getIds().length);
 
-        viewGoodsList = goodsService.search(customerId, 10, 0,  "化品", "", "", "", null);
+        viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "化品", "", "", "", null);
         Assert.assertEquals(0, viewGoodsList.getIds().length);
 
         //单词
-        viewGoodsList = goodsService.search(customerId, 10, 0, "品", "", "", "", null);
+        viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "品", "", "", "", null);
         Assert.assertEquals(0, viewGoodsList.getIds().length);
 
         goods1.setTitle("化妆品");
         solrGoodsRepository.save(goods1);
-        viewGoodsList = goodsService.search(customerId, 10, 0, "化妆品", "", "", "", null);
+        viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "化妆品", "", "", "", null);
         Assert.assertEquals(Long.valueOf(2), viewGoodsList.getIds()[0]);
     }
 
@@ -174,20 +174,20 @@ public class GoodsTest extends BaseTest {
         solrGoodsRepository.save(goods1);
 
         //在找到匹配的情况下 按照指定销量倒序优先
-        ViewList viewGoodsList = goodsService.search(customerId, 10, 0,  "en", "", "", "", 21);
+        ViewList viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "en", "", "", "", 21);
         Assert.assertEquals(2, viewGoodsList.getIds().length);
         Assert.assertEquals(Long.valueOf(2), viewGoodsList.getIds()[0]);
 
         //匹配度高的情况下 优先排序
-        viewGoodsList = goodsService.search(customerId, 10, 0,  "中国化妆品 公司", "", "", "", 21);
+        viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "中国化妆品 公司", "", "", "", 21);
         Assert.assertEquals(1, viewGoodsList.getIds().length);
         Assert.assertEquals(Long.valueOf(1), viewGoodsList.getIds()[0]);
 
     }
 
     @Test
-    public void searchGoodsWeight(){
-        ViewList viewGoodsList = goodsService.search(customerId, 10, 0,  "化妆品", "", "", "", null);
+    public void searchGoodsWeight() {
+        ViewList viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "化妆品", "", "", "", null);
         Assert.assertEquals(2, viewGoodsList.getIds().length);
         Assert.assertEquals(Long.valueOf(1), viewGoodsList.getIds()[0]);
 
@@ -195,7 +195,7 @@ public class GoodsTest extends BaseTest {
         solrGoodsRepository.delete(1L);
         solrGoodsRepository.save(goods1);
         solrGoodsRepository.save(goods);
-        viewGoodsList = goodsService.search(customerId, 10, 0,  "化妆品", "", "", "", null);
+        viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "化妆品", "", "", "", null);
         Assert.assertEquals(2, viewGoodsList.getIds().length);
         Assert.assertEquals(Long.valueOf(1), viewGoodsList.getIds()[0]);
     }
@@ -213,16 +213,16 @@ public class GoodsTest extends BaseTest {
         solrGoodsRepository.save(goods1);
 
         //key brands category hotspot
-        ViewList viewGoodsList = goodsService.search(customerId, 10, 0, "化妆品", "", "2", "", 21);
+        ViewList viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "化妆品", "", "2", "", 21);
         Assert.assertEquals(1, viewGoodsList.getIds().length);
         Assert.assertEquals(Long.valueOf(2), viewGoodsList.getIds()[0]);
 
-        viewGoodsList = goodsService.search(customerId, 10, 0, "化妆品", "2", "", "", 21);
+        viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "化妆品", "2", "", "", 21);
         Assert.assertEquals(1, viewGoodsList.getIds().length);
         Assert.assertEquals(Long.valueOf(2), viewGoodsList.getIds()[0]);
 
 
-         viewGoodsList = goodsService.search(customerId, 10, 0, "化妆品", "", "", "6", 21);
+        viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "化妆品", "", "", "6", 21);
         Assert.assertEquals(1, viewGoodsList.getIds().length);
         Assert.assertEquals(Long.valueOf(2), viewGoodsList.getIds()[0]);
 

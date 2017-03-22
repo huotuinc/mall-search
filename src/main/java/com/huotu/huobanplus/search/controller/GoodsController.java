@@ -21,6 +21,7 @@ public interface GoodsController {
      * 商品搜索
      * 同时搜索词进入搜索热度
      * @param customerId 商家Id
+     * @param ownId 所属店铺，默认-1
      * @param pageSize 每页尺寸 默认10
      * @param pageNo 当前页 默认0第一页
      * @param key 搜索关键字
@@ -42,6 +43,7 @@ public interface GoodsController {
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     @ResponseBody
     ViewList search(@RequestParam(value = "customerId") Long customerId
+            , @RequestParam(value = "ownId", defaultValue = "-1") Long ownId
             , @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
             , @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo
             , @RequestParam(value = "key", required = false) String key
@@ -81,5 +83,5 @@ public interface GoodsController {
     @RequestMapping(value = "/updateByMerchant", method = RequestMethod.POST)
     @ResponseBody
     String updateByMerchantIdAndGoodsId(@RequestParam(value = "customerId") Long customerId,
-                                 @RequestParam(value = "goodsId", required = false) Long goodsId) throws IOException;
+                                        @RequestParam(value = "goodsId", required = false) Long goodsId) throws IOException;
 }

@@ -15,21 +15,23 @@ import java.util.List;
  */
 public class SolrGoodsRepository extends SimpleSolrRepository<Goods, Long> {
 
-    public Long searchMaxId(){
+    public Long searchMaxId() {
         //因为主键只能保存为string类型，查询最大值不准确，所以用时间替代
-        Pageable pageable = new SolrPageRequest(0, 1, new Sort(Sort.Direction.DESC,"updateTime"));
+        Pageable pageable = new SolrPageRequest(0, 1, new Sort(Sort.Direction.DESC, "updateTime"));
         SimpleQuery query = new SimpleQuery("*:*", pageable);
         Page<Goods> maxGoods = getSolrOperations().queryForPage(query, Goods.class);
-        if(maxGoods.getNumberOfElements() == 0){
+        if (maxGoods.getNumberOfElements() == 0) {
             return 0L;
-        }else{
+        } else {
             return maxGoods.getContent().get(0).getId();
         }
     }
 
-    public Page<Goods> search(Long customerId, Integer pageSize, Integer pageNo
+    public Page<Goods> search(Long customerId, Long ownId, Integer pageSize, Integer pageNo
             , String key, String brandIds, String categoryIds, String tagIds, Integer sorts) {
-        Criteria criteria = new Criteria("customerId").is(customerId).and(new Criteria("disabled").is(false));
+        Criteria criteria = new Criteria("customerId").is(customerId)
+                .and(new Criteria("disabled").is(false))
+                .and(new Criteria("ownerId").is(ownId));
 
         //模糊搜索字段权重：商品名称，关键字，品牌，分类名称，副标题，热点名称。
         if (!StringUtils.isEmpty(key)) {
@@ -67,36 +69,42 @@ public class SolrGoodsRepository extends SimpleSolrRepository<Goods, Long> {
      * 10代表 上架时间升序 11代表 上架时间降序
      * 21代表 销量降序
      * 30代表 价格升序 31价格降序
+     *
      * @param sortId
      * @return
      */
     private Sort getSortBySortId(Integer sortId) {
-        if(sortId == null){
+        if (sortId == null) {
             return null;
         }
         String sortColumnName = null;
         Sort.Direction sortDirect = Sort.Direction.DESC;
         Sort sort;
-        if(sortId / 10 > 0){
-            switch (sortId / 10){
+        if (sortId / 10 > 0) {
+            switch (sortId / 10) {
                 case 1:
-                    sortColumnName = "updateTime";break;
+                    sortColumnName = "updateTime";
+                    break;
                 case 2:
-                    sortColumnName = "sales";break;
+                    sortColumnName = "sales";
+                    break;
                 case 3:
-                    sortColumnName = "originalPrice";break;
+                    sortColumnName = "originalPrice";
+                    break;
             }
-            switch (sortId % 10){
+            switch (sortId % 10) {
                 case 0:
-                    sortDirect = Sort.Direction.ASC;break;
+                    sortDirect = Sort.Direction.ASC;
+                    break;
                 case 1:
-                    sortDirect = Sort.Direction.DESC;break;
+                    sortDirect = Sort.Direction.DESC;
+                    break;
             }
         }
-        if(StringUtils.isEmpty(sortColumnName)){
+        if (StringUtils.isEmpty(sortColumnName)) {
             sort = new Sort(Sort.Direction.DESC, "sales", "originalPrice", "updateTime");
-        }else{
-            sort = new Sort(sortDirect,sortColumnName);
+        } else {
+            sort = new Sort(sortDirect, sortColumnName);
         }
         return sort;
     }

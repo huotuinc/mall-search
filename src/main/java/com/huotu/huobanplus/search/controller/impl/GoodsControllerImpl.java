@@ -37,6 +37,7 @@ public class GoodsControllerImpl implements GoodsController {
     @ResponseBody
     @Override
     public ViewList search(@RequestParam(value = "customerId") Long customerId
+            , @RequestParam(value = "ownId", defaultValue = "-1") Long ownId
             , @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
             , @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo
             , @RequestParam(value = "key", required = false) String key
@@ -45,7 +46,7 @@ public class GoodsControllerImpl implements GoodsController {
             , @RequestParam(value = "tags", required = false) String tags
             , @RequestParam(value = "sorts", required = false) Integer sorts) {
         key = hotService.filterSearchKey(key);
-        ViewList result = goodsService.search(customerId, pageSize, pageNo, key, brands, category, tags, sorts);
+        ViewList result = goodsService.search(customerId, ownId, pageSize, pageNo, key, brands, category, tags, sorts);
         //save hot
         if (!StringUtils.isEmpty(key)) {
             hotService.save(customerId, key);

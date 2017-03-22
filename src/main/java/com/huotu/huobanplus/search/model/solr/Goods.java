@@ -24,6 +24,10 @@ public class Goods {
     private Long id;
 
     @Field
+    @Description("所属店铺")
+    private Long ownerId;
+
+    @Field
     @Description("商家Id")
     private Long customerId;
 
@@ -80,7 +84,6 @@ public class Goods {
     private String categoriesId;
 
     /**
-     * 
      * 商品与标签是一对多关系，保存为字符串时前后以"|"连接；查询时按 "|" + tagId + "|" 模糊查询
      */
     @Field

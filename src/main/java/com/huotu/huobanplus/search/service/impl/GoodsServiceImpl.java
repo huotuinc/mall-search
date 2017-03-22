@@ -35,9 +35,9 @@ public class GoodsServiceImpl implements GoodsService {
     private GoodsKeywordsRestRepository goodsKeywordsRestRepository;
 
     @Override
-    public ViewList search(Long customerId, Integer pageSize, Integer pageNo
+    public ViewList search(Long customerId, Long ownId, Integer pageSize, Integer pageNo
             , String key, String brands, String category, String tags, Integer sorts) {
-        Page<Goods> goodsPage = solrGoodsRepository.search(customerId, pageSize, pageNo, key, brands, category, tags, sorts);
+        Page<Goods> goodsPage = solrGoodsRepository.search(customerId, ownId, pageSize, pageNo, key, brands, category, tags, sorts);
 
         ViewList viewGoodsList = new ViewList();
         viewGoodsList.setPageSize(pageSize);
@@ -123,6 +123,11 @@ public class GoodsServiceImpl implements GoodsService {
         if (mallGoods.getOwner() != null) {
             goods.setCustomerId(mallGoods.getOwner().getId());
         }
+        if(mallGoods.getSaleShopId() != null){
+            goods.setOwnerId(mallGoods.getSaleShopId());
+        }else{
+            goods.setOwnerId(0L);
+        }
         goods.setTitle(mallGoods.getTitle());
         if (mallGoods.getBrand() != null) {
             goods.setBrandId(mallGoods.getBrand().getId());
@@ -148,7 +153,7 @@ public class GoodsServiceImpl implements GoodsService {
         if (mallGoodsKeywords != null) {
             StringBuilder keyword = new StringBuilder("|");
             for (GoodsKeywords goodsKeywords : mallGoodsKeywords) {
-                if(goodsKeywords.getPk() != null && !StringUtils.isEmpty(goodsKeywords.getPk().getKeyword())){
+                if (goodsKeywords.getPk() != null && !StringUtils.isEmpty(goodsKeywords.getPk().getKeyword())) {
                     keyword.append(goodsKeywords.getPk().getKeyword()).append("|");
                 }
             }
