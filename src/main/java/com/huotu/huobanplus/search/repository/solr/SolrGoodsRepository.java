@@ -74,7 +74,7 @@ public class SolrGoodsRepository extends SimpleSolrRepository<Goods, Long> {
      * @return
      */
     private Sort getSortBySortId(Integer sortId) {
-        if (sortId == null) {
+        if (sortId == null || sortId == 0) {
             return null;
         }
         String sortColumnName = null;

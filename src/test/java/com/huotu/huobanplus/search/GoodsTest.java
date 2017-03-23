@@ -133,7 +133,7 @@ public class GoodsTest extends BaseTest {
 
         //复杂词的搜索 带特殊字符如空格
         viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "化妆品 公司", "", "", "", null);
-        Assert.assertEquals(2, viewGoodsList.getIds().length);
+        Assert.assertEquals(0, viewGoodsList.getIds().length);
 
         viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "弟弟化妆品的信息", "", "", "", null);
         Assert.assertEquals(2, viewGoodsList.getIds().length);
@@ -179,7 +179,7 @@ public class GoodsTest extends BaseTest {
         Assert.assertEquals(Long.valueOf(2), viewGoodsList.getIds()[0]);
 
         //匹配度高的情况下 优先排序
-        viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "中国化妆品 公司", "", "", "", 21);
+        viewGoodsList = goodsService.search(customerId, -1L, 10, 0, "中国化妆品公司", "", "", "", 21);
         Assert.assertEquals(1, viewGoodsList.getIds().length);
         Assert.assertEquals(Long.valueOf(1), viewGoodsList.getIds()[0]);
 

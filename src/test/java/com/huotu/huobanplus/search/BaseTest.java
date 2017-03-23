@@ -41,6 +41,8 @@ public abstract class BaseTest extends SpringWebTest{
         Goods goods = new Goods();
         goods.setId(Long.valueOf(Math.abs(random.nextInt())));
         goods.setCustomerId(customerId);
+        goods.setDisabled(false);
+        goods.setOwnerId(-1L);
         goods.setUpdateTime(Jsr310Converters.LocalDateTimeToDateConverter.INSTANCE.convert(LocalDateTime.now().minusMinutes(random.nextInt(100))));
         goods.setSales(Math.abs(random.nextLong()));
         goods.setOriginalPrice(Math.abs(random.nextFloat()));
@@ -55,6 +57,8 @@ public abstract class BaseTest extends SpringWebTest{
         Goods goods = new Goods();
         goods.setId(id);
         goods.setCustomerId(customerId);
+        goods.setDisabled(false);
+        goods.setOwnerId(-1L);
         goods.setTitle("goods-" + id);
 //        goods.setPrice(id * 10F);
         goods.setOriginalPrice(id * 20F);
@@ -83,6 +87,8 @@ public abstract class BaseTest extends SpringWebTest{
         Goods goods = new Goods();
         goods.setId(id);
         goods.setCustomerId(customerId);
+        goods.setDisabled(false);
+        goods.setOwnerId(-1L);
         goods.setTitle(title);
 //        goods.setPrice(id * 10F);
         goods.setOriginalPrice(id * 20F);

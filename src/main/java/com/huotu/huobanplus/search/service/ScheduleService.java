@@ -104,8 +104,8 @@ public class ScheduleService {
     /**
      * 每小时的第5分钟开始商品增量
      */
-//    @Scheduled(cron = "0 5 * * * ?")
-    @Scheduled(cron = "0 */2 * * * ?")
+    @Scheduled(cron = "0 5 * * * ?")
+//    @Scheduled(cron = "0 */2 * * * ?")
     public void addGoods() throws IOException {
         if(goodsId == null || goodsId == 0){
             goodsId = goodsService.maxId();
