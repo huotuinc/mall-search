@@ -129,21 +129,13 @@ public class UserServiceImpl implements UserService {
             solrUser = new User();
             solrUser.setId(mallUser.getId());
         }
-        if (mallUser.getMerchant() != null) {
-            solrUser.setCustomerId(mallUser.getMerchant().getId());
-        }
+        solrUser.setCustomerId(mallUser.getMerchantId());
         solrUser.setLevelId(mallUser.getLevelId());
         if (mallUser.getUserType() != null) {
             solrUser.setUserType(mallUser.getUserType().ordinal());
         }
         solrUser.setLoginName(mallUser.getLoginName());
-        com.huotu.huobanplus.common.entity.User parentUser = null;
-        if (mallUser.getBelongOne() != null && mallUser.getBelongOne() > 0) {
-            parentUser = userRestRepository.getOneByPK(mallUser.getBelongOne());
-        }
-        if (parentUser != null) {
-            solrUser.setParentLoginName(parentUser.getLoginName());
-        }
+        solrUser.setParentLoginName(mallUser.getParentLoginName());
         solrUser.setMobileBindRequired(mallUser.isMobileBindRequired());
         if (StringUtils.isNotEmpty(mallUser.getWxNickName())) {
             solrUser.setNickName(mallUser.getWxNickName());
@@ -163,10 +155,10 @@ public class UserServiceImpl implements UserService {
         }
         solrUser.setRegTime(mallUser.getRegTime());
         solrUser.setDeleted(mallUser.isDeleted());
-        if (mallUser.getBinding() != null) {
-            solrUser.setOpenId(mallUser.getBinding().getOpenId());
+        if(!StringUtils.isEmpty(mallUser.getOpenId())){
+            solrUser.setOpenId(mallUser.getOpenId());
         }
-        List<UserDiyTag> diyTagList = diyTagRestRepository.findByUserId(mallUser.getId());
+        List<UserDiyTag> diyTagList = mallUser.getDiyTagList();
         if (diyTagList != null && diyTagList.size() > 0) {
             StringBuilder diyTagSb = new StringBuilder("|");
             for (UserDiyTag tag : diyTagList) {
