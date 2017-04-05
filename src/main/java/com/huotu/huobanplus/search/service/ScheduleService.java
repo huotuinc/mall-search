@@ -53,7 +53,7 @@ public class ScheduleService {
         if (env.acceptsProfiles("development")) {
             merchantId = 4886L;
         }
-        Constant.PAGE_SIZE = env.getProperty("com.huotu.huobanplus.search.pageSize",Integer.class,100);
+        Constant.PAGE_SIZE = env.getProperty("com.huotu.huobanplus.search.pageSize", Integer.class, 100);
         /*new Thread(() -> {
             log.info("start goods sync");
             try {
@@ -66,7 +66,7 @@ public class ScheduleService {
         new Thread(() -> {
             log.info("start user sync");
             try {
-                Thread.sleep(60*1000);
+                Thread.sleep(60 * 1000);
                 syncAllUser();
             } catch (InterruptedException e) {
             }
@@ -107,7 +107,7 @@ public class ScheduleService {
     @Scheduled(cron = "0 5 * * * ?")
 //    @Scheduled(cron = "0 */2 * * * ?")
     public void addGoods() throws IOException {
-        if(goodsId == null || goodsId == 0){
+        if (goodsId == null || goodsId == 0) {
             goodsId = goodsService.maxId();
         }
         log.info("set start goods id :" + goodsId);
@@ -124,7 +124,7 @@ public class ScheduleService {
                 maxGoodsId = goodsPage.getContent().get(goodsPage.getNumberOfElements() - 1).getId();
                 Thread.sleep(10);
             } catch (IOException e) {
-                log.error("add goods at page " + pageNo + " error : " +e);
+                log.error("add goods at page " + pageNo + " error : " + e);
             } catch (InterruptedException e) {
                 log.error("sleep error");
             }
@@ -141,23 +141,7 @@ public class ScheduleService {
     @Scheduled(cron = "0 5 0 * * ?")
     public void syncAllUser() {
         log.info("start sync all user");
-        int pageNo = 0, pageSize = Constant.PAGE_SIZE;
-        while (true) {
-            try {
-                Page<User> userPage = userRestRepository.search(0L, merchantId, new PageRequest(pageNo, pageSize));
-                if (userPage.getNumberOfElements() == 0) {
-                    break;
-                }
-                userService.update(userPage.getContent());
-                Thread.sleep(10);
-            } catch (IOException e) {
-                log.error("sync user at page " + pageNo + "error : "+ e);
-            } catch (InterruptedException e) {
-                log.error("sleep error");
-            }
-            pageNo++;
-            log.debug("sync users pageNo:" + pageNo + " success");
-        }
+        userService.updateByCustomerId(merchantId);
         log.info("end sync all user");
     }
 
@@ -198,7 +182,7 @@ public class ScheduleService {
      * 每天0点5分开始订单全量
      */
     @Scheduled(cron = "0 5 0 * * ?")
-    public void syncAllOrder(){
+    public void syncAllOrder() {
         log.info("start sync all order");
         int pageNo = 0, pageSize = Constant.PAGE_SIZE;
         while (true) {
@@ -210,7 +194,7 @@ public class ScheduleService {
                 orderService.update(orderPage.getContent());
                 Thread.sleep(10);
             } catch (IOException e) {
-                log.error("sync order at page " + pageNo + "error : "+ e);
+                log.error("sync order at page " + pageNo + "error : " + e);
             } catch (InterruptedException e) {
                 log.error("sleep error");
             }
@@ -225,7 +209,7 @@ public class ScheduleService {
      */
     @Scheduled(cron = "0 5 * * * ?")
 //    @Scheduled(cron = "0 */2 * * * ?")
-    public void addOrder(){
+    public void addOrder() {
         if (StringUtils.isEmpty(orderId)) {
             orderId = orderService.maxId();
         }

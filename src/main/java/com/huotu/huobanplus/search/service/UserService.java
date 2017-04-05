@@ -24,9 +24,9 @@ public interface UserService {
 
     void update(Long userId) throws IOException;
 
-    void updateByCustomerId(Long customerId) throws IOException;
+    void updateByCustomerId(Long customerId);
 
-    void update(User user) throws IOException;
+//    void update(User user) throws IOException;
 
     void update(List<User> userList) throws IOException;
 
