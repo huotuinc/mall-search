@@ -29,7 +29,7 @@ public class SolrUserRepository extends SimpleSolrRepository<User, Long> {
         }
     }
 
-    public Page<User> search(Long customerId, Integer pageSize, Integer pageNo
+    public Page<User> search(Long customerId, Integer pageSize, Integer pageNo,Integer exportSize
             , Integer levelId, Integer userType
             , String searchColumn, String fuzzySearchColumn, String searchValue
             , Integer minIntegral, Integer maxIntegral
@@ -68,8 +68,14 @@ public class SolrUserRepository extends SimpleSolrRepository<User, Long> {
         if (StringUtils.isNotEmpty(fuzzySearchColumn) && StringUtils.isNotEmpty(searchValue)) {
             criteria = criteria.and(new Criteria(fuzzySearchColumn).contains(searchValue));
         }
-        Pageable pageable = new SolrPageRequest(pageNo, pageSize, new Sort(sortDirect, sortColumn));
-        SimpleQuery query = new SimpleQuery(criteria, pageable);
+//        Pageable pageable = new SolrPageRequest(pageNo, pageSize, new Sort(sortDirect, sortColumn));
+        if(exportSize == null){
+            exportSize = pageSize;
+        }
+        SimpleQuery query = new SimpleQuery(criteria)
+                .setOffset(pageNo * pageSize)
+                .setRows(exportSize)
+                .addSort(new Sort(sortDirect,sortColumn));
         return getSolrOperations().queryForPage(query, User.class);
     }
 }

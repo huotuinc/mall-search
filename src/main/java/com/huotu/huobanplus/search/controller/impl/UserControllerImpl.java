@@ -34,6 +34,7 @@ public class UserControllerImpl implements UserController {
     public ViewList search(@RequestParam(value = "customerId") Long customerId
             , @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
             , @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo
+            , @RequestParam(value = "exportSize", required = false) Integer exportSize
             , @RequestParam(value = "levelId", required = false) Integer levelId
             , @RequestParam(value = "userType", required = false) Integer userType
             , @RequestParam(value = "searchType", required = false) Integer searchType
@@ -46,7 +47,7 @@ public class UserControllerImpl implements UserController {
             , @RequestParam(value = "sortType", defaultValue = "0") Integer sortType
             , @RequestParam(value = "sortDir", defaultValue = "1") Integer sortDir) {
 
-        ViewList result = userService.search(customerId, pageSize, pageNo
+        ViewList result = userService.search(customerId, pageSize, pageNo,exportSize
                 , getLevelId(levelId), userType
                 , getSearchColumnFromSearchType(searchType), getSearchColumnFromFuzzySearchType(searchType), searchValue
                 , minIntegral, maxIntegral, ToolUtils.getDateFromString(txtBeginTime), ToolUtils.getTomorrowDate(txtEndTime)

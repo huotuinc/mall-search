@@ -38,14 +38,14 @@ public class UserServiceImpl implements UserService {
     private UserDiyTagRestRepository diyTagRestRepository;
 
     @Override
-    public ViewList search(Long customerId, Integer pageSize, Integer pageNo
+    public ViewList search(Long customerId, Integer pageSize, Integer pageNo, Integer exportSize
             , Integer levelId, Integer userType
             , String searchColumn, String fuzzySearchColumn, String searchValue
             , Integer minIntegral, Integer maxIntegral
             , Date searchBeginTime, Date searchEndTime
             , Boolean mobileBindRequired, String diyTags
             , String sortColumn, Sort.Direction sortDirect) {
-        Page<User> userPage = solrUserRepository.search(customerId, pageSize, pageNo, levelId, userType
+        Page<User> userPage = solrUserRepository.search(customerId, pageSize, exportSize, pageNo, levelId, userType
                 , searchColumn, fuzzySearchColumn, searchValue
                 , minIntegral, maxIntegral, searchBeginTime, searchEndTime
                 , mobileBindRequired, diyTags, sortColumn, sortDirect);
@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
         viewGoodsList.setPageSize(pageSize);
         viewGoodsList.setPage(pageNo);
         viewGoodsList.setRecordCount(userPage.getTotalElements());
-        if(userPage.getNumberOfElements() > 0){
+        if (userPage.getNumberOfElements() > 0) {
             Long[] ids = new Long[userPage.getNumberOfElements()];
             for (int i = 0; i < userPage.getNumberOfElements(); i++) {
                 ids[i] = userPage.getContent().get(i).getId();
@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
             try {
                 long start = System.currentTimeMillis();
                 //如果按照分页一页一页查询，越后面的页码会越查越慢，所以设置起始的userId，每次只查第一页，这样会提高查询效率
-                Page<com.huotu.huobanplus.common.entity.User> mallUserList = userRestRepository.search(userId,customerId, new PageRequest(pageNo, pageSize));
+                Page<com.huotu.huobanplus.common.entity.User> mallUserList = userRestRepository.search(userId, customerId, new PageRequest(pageNo, pageSize));
                 long end = System.currentTimeMillis();
                 if (mallUserList.getNumberOfElements() == 0) {
                     break;
@@ -100,7 +100,7 @@ public class UserServiceImpl implements UserService {
             } catch (IOException e) {
                 log.error("sync users start id " + userId + ", pageNo:" + pageNo + " error");
                 //为了防止因为某个ID的查询失败而无法同步后面的数据，在此跳过这个ID
-                userId ++;
+                userId++;
             } catch (InterruptedException e) {
                 log.error("sleep error");
             }
@@ -174,9 +174,9 @@ public class UserServiceImpl implements UserService {
         }
         solrUser.setRegTime(mallUser.getRegTime());
         solrUser.setDeleted(mallUser.isDeleted());
-        if(!StringUtils.isEmpty(mallUser.getOpenId())){
+        if (!StringUtils.isEmpty(mallUser.getOpenId())) {
             solrUser.setOpenId(mallUser.getOpenId());
-        }else{
+        } else {
             solrUser.setOpenId(null);
         }
         List<UserDiyTag> diyTagList = mallUser.getDiyTagList();
@@ -186,7 +186,7 @@ public class UserServiceImpl implements UserService {
                 diyTagSb.append(tag.getTagId()).append("|");
             }
             solrUser.setDiyTagIds(diyTagSb.toString());
-        }else{
+        } else {
             solrUser.setDiyTagIds(null);
         }
         return solrUser;
@@ -194,6 +194,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 根据userId查询MallUser,由于各种关联会产生很多不必要的查询，所以查询效率低，只适用于某个id的用户更新
+     *
      * @param userId
      * @param solrUser
      * @return

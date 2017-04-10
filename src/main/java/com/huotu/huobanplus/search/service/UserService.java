@@ -12,7 +12,7 @@ import java.util.List;
  * Created by helloztt on 2017-02-28.
  */
 public interface UserService {
-    ViewList search(Long customerId, Integer pageSize, Integer pageNo
+    ViewList search(Long customerId, Integer pageSize, Integer pageNo,Integer exportSize
             , Integer levelId, Integer userType
             , String searchColumn, String fuzzySearchColumn, String fuzzySearchValue
             , Integer minIntegral, Integer maxIntegral
