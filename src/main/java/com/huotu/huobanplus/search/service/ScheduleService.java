@@ -51,19 +51,19 @@ public class ScheduleService {
     @PostConstruct
     public void init() throws IOException {
         if (env.acceptsProfiles("development")) {
-            merchantId = 4886L;
+//            merchantId = 4886L;
         }
         Constant.PAGE_SIZE = env.getProperty("com.huotu.huobanplus.search.pageSize", Integer.class, 100);
-        /*new Thread(() -> {
+        new Thread(() -> {
             log.info("start goods sync");
             try {
-                Thread.sleep(60*1000);
+                Thread.sleep(10*1000);
                 syncAllGoods();
             } catch (InterruptedException e) {
             }
             log.info("end goods sync");
         }).start();
-        new Thread(() -> {
+        /*new Thread(() -> {
             log.info("start user sync");
             try {
                 Thread.sleep(60 * 1000);
@@ -78,26 +78,10 @@ public class ScheduleService {
     /**
      * 每天0点5分开始商品全量
      */
-    @Scheduled(cron = "0 5 0 * * ?")
+//    @Scheduled(cron = "0 5 0 * * ?")
     public void syncAllGoods() {
         log.info("start sync all goods");
-        int pageNo = 0, pageSize = Constant.PAGE_SIZE;
-        while (true) {
-            try {
-                Page<Goods> goodsPage = goodsRestRepository.search(0L, merchantId, new PageRequest(pageNo, pageSize));
-                if (goodsPage.getNumberOfElements() == 0) {
-                    break;
-                }
-                goodsService.update(goodsPage.getContent());
-                Thread.sleep(10);
-            } catch (IOException e) {
-                log.error("sync goods at page " + pageNo + " error : " + e);
-            } catch (InterruptedException e) {
-                log.error("sleep error");
-            }
-            pageNo++;
-            log.debug("sync goods pageNo:" + pageNo + " success");
-        }
+        goodsService.updateByCustomerId(merchantId);
         log.info("end sync all goods");
     }
 
@@ -148,7 +132,7 @@ public class ScheduleService {
     /**
      * 每小时的第5分钟开始用户增量
      */
-    @Scheduled(cron = "0 5 * * * ?")
+//    @Scheduled(cron = "0 5 * * * ?")
 //    @Scheduled(cron = "0 */5 * * * ?")
     public void addUsers() {
         if (userId == null || userId == 0) {
@@ -181,7 +165,7 @@ public class ScheduleService {
     /**
      * 每天0点5分开始订单全量
      */
-    @Scheduled(cron = "0 5 0 * * ?")
+//    @Scheduled(cron = "0 5 0 * * ?")
     public void syncAllOrder() {
         log.info("start sync all order");
         int pageNo = 0, pageSize = Constant.PAGE_SIZE;
@@ -207,7 +191,7 @@ public class ScheduleService {
     /**
      * 每小时的第5分钟开始订单增量
      */
-    @Scheduled(cron = "0 5 * * * ?")
+//    @Scheduled(cron = "0 5 * * * ?")
 //    @Scheduled(cron = "0 */2 * * * ?")
     public void addOrder() {
         if (StringUtils.isEmpty(orderId)) {

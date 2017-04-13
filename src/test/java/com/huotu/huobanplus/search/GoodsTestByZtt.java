@@ -109,7 +109,7 @@ public class GoodsTestByZtt extends BaseTest {
     public void searchBySearchKey() {
 
         //模糊搜索，权重从高到底依次为 商品名称，关键字，品牌，分类名称，虚拟分类名称，副标题，热点名称。
-        ViewList resultList = goodsService.search(customerId, -1L, 10, 0, searchKeyWord, null, null, null, 0);
+        ViewList resultList = goodsService.searchIds(customerId, -1L,-1L, 10, 0, searchKeyWord, null, null, null,null, "0");
         assertNotNull(resultList);
         assertEquals(searchColumnNum, resultList.getIds().length);
         assertEquals(goodsWithTitle.getId(), resultList.getIds()[0]);
@@ -123,7 +123,7 @@ public class GoodsTestByZtt extends BaseTest {
 
         goodsWithKeyWord.setBrandName(searchKeyWord);
         solrGoodsRepository.save(goodsWithKeyWord);
-        resultList = goodsService.search(customerId, -1L, 10, 0, searchKeyWord, null, null, null, 0);
+        resultList = goodsService.searchIds(customerId, -1L,-1L, 10, 0, searchKeyWord, null, null,null, null, "0");
         assertNotNull(resultList);
         assertEquals(searchColumnNum, resultList.getIds().length);
         assertEquals(goodsWithKeyWord.getId(), resultList.getIds()[0]);
@@ -137,17 +137,17 @@ public class GoodsTestByZtt extends BaseTest {
         String searchBrandId = "1|2|3|4|5|6";
         String searchTagsId = "10|9|7";
 
-        ViewList resultList = goodsService.search(customerId, -1L, 10, 0, null, searchBrandId, null, null, null);
+        ViewList resultList = goodsService.searchIds(customerId, -1L,-1L, 10, 0, null, searchBrandId, null, null,null, null);
         assertNotNull(resultList);
         assertEquals(1, resultList.getIds().length);
         assertEquals(goodsWithBrandId.getId(), resultList.getIds()[0]);
 
-        resultList = goodsService.search(customerId, -1L, 10, 0, null, null, searchCatId, null, null);
+        resultList = goodsService.searchIds(customerId, -1L,-1L, 10, 0, null, null, searchCatId, null, null,null);
         assertNotNull(resultList);
         assertEquals(1, resultList.getIds().length);
         assertEquals(goodsWithCatId.getId(), resultList.getIds()[0]);
 
-        resultList = goodsService.search(customerId, -1L, 10, 0, null, null, null, searchTagsId, null);
+        resultList = goodsService.searchIds(customerId, -1L,-1L, 10, 0, null, null, null, searchTagsId, null,null);
         assertNotNull(resultList);
         assertEquals(1, resultList.getIds().length);
         assertEquals(goodsWithTagsId.getId(), resultList.getIds()[0]);
@@ -157,35 +157,35 @@ public class GoodsTestByZtt extends BaseTest {
     public void testBySort() {
         //按上架时间升序
         goodsList.sort(Comparator.comparing(Goods::getUpdateTime));
-        ViewList resultList = goodsService.search(customerId, -1L, 10, 0, null, null, null, null, 10);
+        ViewList resultList = goodsService.searchIds(customerId, -1L,-1L, 10, 0, null, null, null, null,null, "1");
         for (int i = 0; i < resultList.getIds().length; i++) {
             assertEquals(goodsList.get(i).getId(), resultList.getIds()[i]);
         }
 
         //按上架时间降序
         goodsList.sort((Goods g1, Goods g2) -> g2.getUpdateTime().compareTo(g1.getUpdateTime()));
-        resultList = goodsService.search(customerId, -1L, 10, 0, null, null, null, null, 11);
+        resultList = goodsService.searchIds(customerId, -1L,-1L, 10, 0, null, null, null, null,null, "2");
         for (int i = 0; i < resultList.getIds().length; i++) {
             assertEquals(goodsList.get(i).getId(), resultList.getIds()[i]);
         }
 
         //按销量降序
         goodsList.sort((Goods g1, Goods g2) -> g2.getSales().compareTo(g1.getSales()));
-        resultList = goodsService.search(customerId, -1L, 10, 0, null, null, null, null, 21);
+        resultList = goodsService.searchIds(customerId, -1L,-1L, 10, 0, null, null, null, null,null, "4");
         for (int i = 0; i < resultList.getIds().length; i++) {
             assertEquals(goodsList.get(i).getId(), resultList.getIds()[i]);
         }
 
         //按价格升序
         goodsList.sort(Comparator.comparing(Goods::getOriginalPrice));
-        resultList = goodsService.search(customerId, -1L, 10, 0, null, null, null, null, 30);
+        resultList = goodsService.searchIds(customerId, -1L,-1L, 10, 0, null, null, null, null,null, "5");
         for (int i = 0; i < resultList.getIds().length; i++) {
             assertEquals(goodsList.get(i).getId(), resultList.getIds()[i]);
         }
 
         //按价格降序
         goodsList.sort((Goods g1, Goods g2) -> g2.getOriginalPrice().compareTo(g1.getOriginalPrice()));
-        resultList = goodsService.search(customerId, -1L, 10, 0, null, null, null, null, 31);
+        resultList = goodsService.searchIds(customerId,-1L, -1L, 10, 0, null, null, null, null,null, "6");
         for (int i = 0; i < resultList.getIds().length; i++) {
             assertEquals(goodsList.get(i).getId(), resultList.getIds()[i]);
         }

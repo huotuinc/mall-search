@@ -24,8 +24,12 @@ public class ViewList {
       * 总记录数
       */
      private Long recordCount;
+     /**
+      * 总页面数
+      */
+     private int pageCount;
 //     private  Paging paging;
      private Object[] ids;
 
-//    private List<ViewGoods> list;
+    private List list;
 }

@@ -25,6 +25,7 @@ import java.util.List;
  */
 
 @Controller
+@RequestMapping("/goods")
 public class GoodsControllerImpl implements GoodsController {
     private static Log log = LogFactory.getLog(GoodsControllerImpl.class);
 
@@ -33,20 +34,45 @@ public class GoodsControllerImpl implements GoodsController {
     @Autowired
     private HotService hotService;
 
-    @RequestMapping(value = "/search", method = RequestMethod.POST)
+    @RequestMapping(value = "/searchIds", method = RequestMethod.POST)
     @ResponseBody
     @Override
-    public ViewList search(@RequestParam(value = "customerId") Long customerId
+    public ViewList searchIds(@RequestParam(value = "customerId") Long customerId
+            , @RequestParam(value = "supplierId") Long supplierId
             , @RequestParam(value = "ownId", defaultValue = "-1") Long ownId
             , @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
             , @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo
             , @RequestParam(value = "key", required = false) String key
             , @RequestParam(value = "brands", required = false) String brands
             , @RequestParam(value = "category", required = false) String category
+            , @RequestParam(value = "typeIds", required = false) String typeIds
             , @RequestParam(value = "tags", required = false) String tags
-            , @RequestParam(value = "sorts", required = false) Integer sorts) {
+            , @RequestParam(value = "sorts", required = false) String sorts) {
         key = hotService.filterSearchKey(key);
-        ViewList result = goodsService.search(customerId, ownId, pageSize, pageNo, key, brands, category, tags, sorts);
+        ViewList result = goodsService.searchIds(customerId, supplierId, ownId, pageSize, pageNo, key, brands, category, typeIds, tags, sorts);
+        //save hot
+        if (!StringUtils.isEmpty(key)) {
+            hotService.save(customerId, key);
+        }
+        return result;
+    }
+
+    @RequestMapping(value = "/search", method = RequestMethod.POST)
+    @ResponseBody
+    @Override
+    public ViewList search(@RequestParam(value = "customerId") Long customerId
+            , @RequestParam(value = "supplierId",required = false) Long supplierId
+            , @RequestParam(value = "ownId", defaultValue = "-1") Long ownId
+            , @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
+            , @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo
+            , @RequestParam(value = "key", required = false) String key
+            , @RequestParam(value = "brands", required = false) String brands
+            , @RequestParam(value = "category", required = false) String category
+            , @RequestParam(value = "typeIds", required = false) String typeIds
+            , @RequestParam(value = "tags", required = false) String tags
+            , @RequestParam(value = "sorts", required = false) String sorts) {
+        key = hotService.filterSearchKey(key);
+        ViewList result = goodsService.search(customerId, supplierId, ownId, pageSize, pageNo, key, brands, category, typeIds, tags, sorts);
         //save hot
         if (!StringUtils.isEmpty(key)) {
             hotService.save(customerId, key);
@@ -57,7 +83,9 @@ public class GoodsControllerImpl implements GoodsController {
     @RequestMapping(value = "/suggest", method = RequestMethod.GET)
     @ResponseBody
     @Override
-    public List<String> suggest(@RequestParam(value = "customerId") Long customerId, @RequestParam(value = "pageSize", required = false) Integer pageSize, @RequestParam(value = "key") String key) {
+    public List<String> suggest(@RequestParam(value = "customerId") Long customerId
+            , @RequestParam(value = "pageSize", required = false) Integer pageSize
+            , @RequestParam(value = "key") String key) {
         key = hotService.filterSearchKey(key);
         return hotService.suggest(customerId, key, pageSize);
     }
@@ -70,7 +98,7 @@ public class GoodsControllerImpl implements GoodsController {
         if (goodsId == null) {
             goodsService.updateByCustomerId(customerId);
         } else {
-            goodsService.update(customerId, goodsId);
+            goodsService.update(goodsId);
         }
         return "success";
     }

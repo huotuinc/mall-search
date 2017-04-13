@@ -18,7 +18,7 @@ public interface GoodsController {
 
 
     /***
-     * 商品搜索
+     * 商品搜索，返回商品主键列表
      * 同时搜索词进入搜索热度
      * @param customerId 商家Id
      * @param ownId 所属店铺，默认-1
@@ -30,29 +30,75 @@ public interface GoodsController {
      *            权重：按照 商品名称，关键字，品牌，分类名称，副标题，热点名称 顺序依次由高到低
      * @param  brands 品牌 （筛选项 品牌id |隔开）
      * @param category 分类 （筛选项 分类id |隔开）
+     * @param typeIds 类目 筛选项 分类id |隔开）
      * @param  tags 商品标签（正品保证|海外直采|免税闪购|七天退换|海南直发）（筛选项 |隔开）
      * @param sorts 排序
      *              排序依据：新品，销量，价格
      *              example：
-     *              0代表 销量（降序），价格（降序），上架时间（降序）
-     *              10代表 上架时间升序 11代表 上架时间降序
-     *              21代表 销量降序
-     *              30代表 价格升序 31价格降序
+     *              按时间降序排序 = 1,
+     *              按时间升序排序 = 2,
+     *              按销售量降序排序 = 3,
+     *              按销售量升序排序 = 4,
+     *              按价格降序排序 = 5,
+     *              按价格升序排序 = 6
      * @return 商品主键列表
      */
-    @RequestMapping(value = "/search", method = RequestMethod.POST)
+    @RequestMapping(value = "/searchIds", method = RequestMethod.POST)
     @ResponseBody
-    ViewList search(@RequestParam(value = "customerId") Long customerId
+    ViewList searchIds(@RequestParam(value = "customerId") Long customerId
+            , @RequestParam(value = "supplierId") Long supplierId
             , @RequestParam(value = "ownId", defaultValue = "-1") Long ownId
             , @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
             , @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo
             , @RequestParam(value = "key", required = false) String key
             , @RequestParam(value = "brands", required = false) String brands
             , @RequestParam(value = "category", required = false) String category
+            , @RequestParam(value = "typeIds", required = false) String typeIds
             , @RequestParam(value = "tags", required = false) String tags
-            , @RequestParam(value = "sorts", required = false) Integer sorts
+            , @RequestParam(value = "sorts", required = false) String sorts
 
     );
+
+    /***
+     * 商品搜索，返回商品主键列表
+     * 同时搜索词进入搜索热度
+     * @param customerId 商家Id
+     * @param supplierId  供应商ID
+     * @param ownId 所属店铺，默认-1
+     * @param pageSize 每页尺寸 默认10
+     * @param pageNo 当前页 默认0第一页
+     * @param key 搜索关键字
+     *            搜索范围：商品的标题，副标题，关键字，标签，供应商 可用空格分隔
+     *            example：阿迪达斯T恤 equal to 阿迪达斯 T恤
+     *            权重：按照 商品名称，关键字，品牌，分类名称，副标题，热点名称 顺序依次由高到低
+     * @param  brands 品牌 （筛选项 品牌id |隔开）
+     * @param category 分类 （筛选项 分类id |隔开）
+     * @param typeIds 类目 筛选项 分类id |隔开）
+     * @param  tags 商品标签（正品保证|海外直采|免税闪购|七天退换|海南直发）（筛选项 |隔开）
+     * @param sorts 排序
+     *              排序依据：新品，销量，价格 可组合排序，用|隔开
+     *              example：
+     *              按时间降序排序 = 1,
+     *              按时间升序排序 = 2,
+     *              按销售量降序排序 = 3,
+     *              按销售量升序排序 = 4,
+     *              按价格降序排序 = 5,
+     *              按价格升序排序 = 6
+     * @return 商品主键列表
+     */
+    @RequestMapping(value = "/search", method = RequestMethod.POST)
+    @ResponseBody
+    ViewList search(@RequestParam(value = "customerId") Long customerId
+            , @RequestParam(value = "supplierId",required = false) Long supplierId
+            , @RequestParam(value = "ownId", defaultValue = "-1") Long ownId
+            , @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
+            , @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo
+            , @RequestParam(value = "key", required = false) String key
+            , @RequestParam(value = "brands", required = false) String brands
+            , @RequestParam(value = "category", required = false) String category
+            , @RequestParam(value = "typeIds", required = false) String typeIds
+            , @RequestParam(value = "tags", required = false) String tags
+            , @RequestParam(value = "sorts", required = false) String sorts);
 
     /***
      * 搜索建议

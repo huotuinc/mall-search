@@ -8,6 +8,7 @@ import org.springframework.data.solr.core.query.*;
 import org.springframework.data.solr.repository.support.SimpleSolrRepository;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,11 +28,16 @@ public class SolrGoodsRepository extends SimpleSolrRepository<Goods, Long> {
         }
     }
 
-    public Page<Goods> search(Long customerId, Long ownId, Integer pageSize, Integer pageNo
-            , String key, String brandIds, String categoryIds, String tagIds, Integer sorts) {
+    public Page<Goods> search(Long customerId, Long supplierId, Long ownId, Integer pageSize, Integer pageNo
+            , String key, String brandIds, String categoryIds, String typeIds, String tagIds, String sorts) {
         Criteria criteria = new Criteria("customerId").is(customerId)
-                .and(new Criteria("disabled").is(false))
-                .and(new Criteria("ownerId").is(ownId));
+                .and(new Criteria("disabled").is(false));
+        if (ownId != -1) {
+            criteria = criteria.and(new Criteria("ownerId").is(ownId));
+        }
+        if (supplierId != null && supplierId != -1) {
+            criteria = criteria.and(new Criteria("supplierId").is(supplierId));
+        }
 
         //模糊搜索字段权重：商品名称，关键字，品牌，分类名称，副标题，热点名称。
         if (!StringUtils.isEmpty(key)) {
@@ -47,15 +53,19 @@ public class SolrGoodsRepository extends SimpleSolrRepository<Goods, Long> {
         }
         //根据品牌ID搜索
         if (!StringUtils.isEmpty(brandIds)) {
-            criteria = criteria.and(new Criteria("brandId").is(brandIds.split("\\|")));
+            criteria = criteria.and(new Criteria("brandId").is(brandIds));
         }
         //根据分类ID搜索
         if (!StringUtils.isEmpty(categoryIds)) {
-            criteria = criteria.and(new Criteria("categoriesId").is(categoryIds.split("\\|")));
+            criteria = criteria.and(new Criteria("categoriesId").is(categoryIds));
+        }
+        //根据类目ID搜索
+        if (!StringUtils.isEmpty(typeIds)) {
+            criteria = criteria.and(new Criteria("typePath").is(typeIds));
         }
         //根据标签ID搜索（1商品-N标签）
         if (!StringUtils.isEmpty(tagIds)) {
-            criteria = criteria.and(new Criteria("tagIds").is(tagIds.split("\\|")));
+            criteria = criteria.and(new Criteria("tagIds").is(tagIds));
         }
 
         Pageable pageable = new SolrPageRequest(pageNo, pageSize, getSortBySortId(sorts));
@@ -64,47 +74,49 @@ public class SolrGoodsRepository extends SimpleSolrRepository<Goods, Long> {
     }
 
     /**
-     * 排序规则：第一位表示排序字段，第二位表示升降序（0：升，1：降）
-     * 0（默认）代表 销量（降序），价格（降序），上架时间（降序）
-     * 10代表 上架时间升序 11代表 上架时间降序
-     * 21代表 销量降序
-     * 30代表 价格升序 31价格降序
+     * 排序规则：
+     *
+     *              按时间降序排序 = 1,
+     *              按时间升序排序 = 2,
+     *              按销售量降序排序 = 3,
+     *              按销售量升序排序 = 4,
+     *              按价格降序排序 = 5,
+     *              按价格升序排序 = 6
      *
      * @param sortId
      * @return
      */
-    private Sort getSortBySortId(Integer sortId) {
-        if (sortId == null || sortId == 0) {
+    private Sort getSortBySortId(String sortId) {
+        if (StringUtils.isEmpty(sortId)) {
             return null;
         }
-        String sortColumnName = null;
-        Sort.Direction sortDirect = Sort.Direction.DESC;
-        Sort sort;
-        if (sortId / 10 > 0) {
-            switch (sortId / 10) {
-                case 1:
-                    sortColumnName = "updateTime";
+        Sort sort = null;
+        String[] sortTypeStr = sortId.split("|");
+        List<Sort.Order> orderList = new ArrayList<>();
+        for(String sortType : sortTypeStr){
+            switch (sortType){
+                case "1":
+                    orderList.add(new Sort.Order(Sort.Direction.DESC,"updateTime"));
                     break;
-                case 2:
-                    sortColumnName = "sales";
+                case "2":
+                    orderList.add(new Sort.Order(Sort.Direction.ASC,"updateTime"));
                     break;
-                case 3:
-                    sortColumnName = "originalPrice";
+                case "3":
+                    orderList.add(new Sort.Order(Sort.Direction.DESC,"sales"));
                     break;
-            }
-            switch (sortId % 10) {
-                case 0:
-                    sortDirect = Sort.Direction.ASC;
+                case "4":
+                    orderList.add(new Sort.Order(Sort.Direction.ASC,"sales"));
                     break;
-                case 1:
-                    sortDirect = Sort.Direction.DESC;
+                case "5":
+                    orderList.add(new Sort.Order(Sort.Direction.DESC,"originalPrice"));
+                    break;
+                case "6":
+                    orderList.add(new Sort.Order(Sort.Direction.ASC,"originalPrice"));
                     break;
             }
         }
-        if (StringUtils.isEmpty(sortColumnName)) {
-            sort = new Sort(Sort.Direction.DESC, "sales", "originalPrice", "updateTime");
-        } else {
-            sort = new Sort(sortDirect, sortColumnName);
+        if(orderList != null && orderList.size() > 0){
+            sort = new Sort(orderList);
         }
         return sort;
     }

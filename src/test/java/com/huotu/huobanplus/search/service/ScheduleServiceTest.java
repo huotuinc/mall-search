@@ -30,7 +30,8 @@ public class ScheduleServiceTest extends BaseTest {
 
     @Test
     public void testAddGoods() throws IOException {
-        customerId = 296L;
+//        customerId = 296L;
+        customerId = 4886L;
         solrGoodsRepository.deleteAll();
         long beforeCount = solrGoodsRepository.count();
         assertEquals(0, beforeCount);
@@ -45,7 +46,7 @@ public class ScheduleServiceTest extends BaseTest {
 
         long total = goodsRestRepository.searchByMerchantPK(customerId, new PageRequest(0, 1)).getTotalElements();
         scheduleService.goodsId = 0L;
-        scheduleService.addGoods();
+        scheduleService.syncAllGoods();
         long afterAddGoods = solrGoodsRepository.count();
         assertEquals(beforeCount + total, afterAddGoods);
     }

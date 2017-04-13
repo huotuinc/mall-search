@@ -1,5 +1,7 @@
 package com.huotu.huobanplus.search.model.solr;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.solr.client.solrj.beans.Field;
@@ -25,11 +27,11 @@ public class Goods {
 
     @Field
     @Description("所属店铺")
-    private Long ownerId;
+    private Long ownerId = 0L;
 
     @Field
     @Description("商家Id")
-    private Long customerId;
+    private Long customerId = 0L;
 
     @Field
     @Indexed(boost = 1.0f)
@@ -74,7 +76,7 @@ public class Goods {
 
     @Field
     @Description("品牌Id")
-    private Long brandId;
+    private Long brandId = 0L;
 
     /**
      * 商品与分类是一对一关系，但是分类存在Path，这里保存分类ID的PATH，查询时按 "|" + categoryId + "|" 模糊查询
@@ -92,17 +94,117 @@ public class Goods {
 
     @Field
     @Description("新品(上架时间)")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 
     @Field
     @Description("销量")
-    private Long sales;
+    private Long sales = 0L;
 
     @Field
     @Description("原价")
-    private Float originalPrice;
+    private Float originalPrice = 0F;
 
     @Field
     @Description("是否可用")
     private boolean disabled;
+
+    /**
+     * @since 1.1
+     */
+    @Field
+    @Description("类型ID")
+    private Long typeId = 0L;
+
+    @Field
+    @Description("分类ID")
+    private Long catId = 0L;
+
+    @Field
+    @Description("供应商ID")
+    private Long supplierId = 0L;
+
+    @Field
+    @Description("商品主图，小图")
+    private String smallPic;
+
+    @Field
+    @Description("简介")
+    private String brief;
+
+    @Field
+    @Description("市场价")
+    private double marketPrice;
+
+    @Field
+    @Description("商品价格")
+    private double price;
+
+    @Field
+    @Description("商品规格冗余")
+    private String spec;
+
+    @Field
+    @Description("货品规格冗余")
+    private String pdtDesc;
+
+    @Field
+    @Description("商品规格")
+    private String specDesc;
+
+    @Field
+    @Description("专享价类型")
+    private Integer vipRebateType = 0;
+
+    @Field
+    @Description("专享价")
+    private String vipRebateItems;
+
+    @Field
+    @Description("各个会员级别的价格冗余")
+    private String priceLevelDesc;
+
+    @Field
+    @Description("八级返利的冗余字段")
+    private String disRebateDesc;
+
+    @Field
+    @Description("个性化经营者返利配置信息")
+    private String customTmrRebateSetting;
+
+    @Field
+    @Description("商品返利是否个性化")
+    private Integer individuation;
+
+    @Field
+    @Description("返利计算模式")
+    @JsonProperty(defaultValue = "0")
+    private Integer rebateMode = 0;
+
+    @Field
+    @Description("返利设置(按配额)")
+    @JsonProperty("rebateQuatoSetting")
+    private String rebateQuotaSetting;
+
+    @Field
+    @Description("返利参数，按配额返利时的参数")
+    @JsonProperty(value = "rebateQuatoRatio")
+    private Double rebateQuotaRatio = 0D;
+
+    @Field
+    @Description("返利设置(按销售额)")
+    private String rebateSaleSetting;
+
+    @Field
+    @Description("返利参数，按销售额返利时的返利系数")
+    private Double rebateSaleRatio = 0D;
+
+
+    @Field
+    @Description("是否个性化经营者返利")
+    @JsonProperty(value = "customTmrRebateFlag")
+    private Integer customManagerRebateFlag = 0;
+
+
+
 }
