@@ -141,6 +141,10 @@ public class Goods {
     private double price;
 
     @Field
+    @Description("用户最低价")
+    private double minUserPrice;
+
+    @Field
     @Description("商品规格冗余")
     private String spec;
 

@@ -130,7 +130,7 @@
         <dependency>
             <groupId>com.huotu.huobanplus</groupId>
             <artifactId>common-client</artifactId>
-            <version>1.7.3-SNAPSHOT</version>
+            <version>1.7.4-SNAPSHOT</version>
         </dependency>
 
         <dependency>

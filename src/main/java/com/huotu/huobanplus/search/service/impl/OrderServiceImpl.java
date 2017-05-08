@@ -32,22 +32,22 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public ViewList search(Long customerId, Long supplierId, Integer pageSize, Integer pageNo,
-                           String orderId, String unionOrderId, String goodsName, String userLoginName, String shipName, String shipMobile,
+    public ViewList search(Long customerId, Long supplierId, Integer pageSize, Integer pageNo, Integer exportSize,
+                           String orderId, String unionOrderId, String goodsName, Integer goodsId, String userLoginName, String shipName, String shipMobile,
                            Date createBeginTime, Date createEndTime, Date payBeginTime, Date payEndTime,
                            Integer payStatus, Integer shipStatus, Integer orderStatus, Integer sourceType, Integer payType,
                            Boolean shipDisabled, String sortColumn, Sort.Direction sortDirect) {
-        Page<Order> orderPage = solrOrderRepository.search(customerId, supplierId, pageSize, pageNo,
-                orderId, unionOrderId, userLoginName, shipName, shipMobile,
+        Page<Order> orderPage = solrOrderRepository.search(customerId, supplierId, pageSize, pageNo, exportSize,
+                orderId, unionOrderId, goodsName, goodsId, userLoginName, shipName, shipMobile,
                 payStatus, shipStatus, orderStatus, sourceType, shipDisabled,
                 createBeginTime, createEndTime, payBeginTime, payEndTime, sortColumn, sortDirect);
         ViewList viewOrderList = new ViewList();
         viewOrderList.setPageSize(pageSize);
         viewOrderList.setPage(pageNo);
         viewOrderList.setRecordCount(orderPage.getTotalElements());
-        if(orderPage.getNumberOfElements() != 0){
+        if (orderPage.getNumberOfElements() != 0) {
             String[] ids = new String[orderPage.getNumberOfElements()];
-            for(int i=0;i< orderPage.getNumberOfElements();i++){
+            for (int i = 0; i < orderPage.getNumberOfElements(); i++) {
                 ids[i] = orderPage.getContent().get(i).getId();
             }
             viewOrderList.setIds(ids);
@@ -58,7 +58,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public String maxId() {
         String maxId = solrOrderRepository.searchMaxId();
-        if(maxId == null){
+        if (maxId == null) {
             maxId = "";
         }
         return maxId;
@@ -66,9 +66,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void update(String orderId) throws IOException {
-        com.huotu.huobanplus.common.entity.Order mallOrder = ordersRestRepository.getOneByPK(orderId);
-        if (mallOrder != null) {
-            update(mallOrder);
+        Order solrOrder = solrOrderRepository.findOne(orderId);
+        if (solrOrder != null) {
+            solrOrder = mallOrderToSolrOrder(orderId, solrOrder);
+            solrOrderRepository.save(solrOrder);
         }
     }
 
@@ -85,14 +86,14 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
-    @Override
+    /*@Override
     public void update(com.huotu.huobanplus.common.entity.Order mallOrder) throws IOException {
         Order solrOrder = solrOrderRepository.findOne(mallOrder.getId());
-        solrOrder = mallOrderToSolrOrder(mallOrder, solrOrder);
+        solrOrder = mallOrderToSolrOrder(mallOrder.getId(), solrOrder);
         if (solrOrder != null) {
             solrOrderRepository.save(solrOrder);
         }
-    }
+    }*/
 
     @Override
     public void update(List<com.huotu.huobanplus.common.entity.Order> orderList) throws IOException {
@@ -122,12 +123,31 @@ public class OrderServiceImpl implements OrderService {
             solrOrder = new Order();
             solrOrder.setId(mallOrder.getId());
         }
-        solrOrder.setUnionOrderId(mallOrder.getMainOrderNo());
-        if (mallOrder.getMerchant() != null) {
-            solrOrder.setCustomerId(mallOrder.getMerchant().getId());
+        solrOrder.setUnionOrderId(mallOrder.getSolrOrder().getUnionOrderId());
+        solrOrder.setCustomerId(mallOrder.getSolrOrder().getCustomerId());
+        solrOrder.setSupplierId(mallOrder.getSolrOrder().getSupplierId());
+        solrOrder.setUserName(mallOrder.getSolrOrder().getUserName());
+        solrOrder.setReceiver(mallOrder.getSolrOrder().getReceiver());
+        solrOrder.setShipMobile(mallOrder.getSolrOrder().getShipMobile());
+        solrOrder.setCreateTime(mallOrder.getSolrOrder().getCreateTime());
+        solrOrder.setPayTime(mallOrder.getSolrOrder().getPayTime());
+        solrOrder.setOrderStatus(mallOrder.getSolrOrder().getOrderStatus());
+        solrOrder.setPayStatus(mallOrder.getSolrOrder().getPayStatus());
+        solrOrder.setShipStatus(mallOrder.getSolrOrder().getShipStatus());
+        solrOrder.setSourceType(mallOrder.getSolrOrder().getSourceType());
+        solrOrder.setGoodsName(mallOrder.getSolrOrder().getGoodsName());
+        solrOrder.setGoodsId(mallOrder.getSolrOrder().getGoodsIds());
+        solrOrder.setPaymentType(mallOrder.getSolrOrder().getPaymentType());
+        solrOrder.setShipDisabled(mallOrder.getSolrOrder().getShipDisabled());
+        solrOrder.setFinalAmount(mallOrder.getSolrOrder().getFinalAmount());
+        return solrOrder;
+    }
+
+    private Order mallOrderToSolrOrder(String orderId, Order solrOrder) throws IOException {
+        com.huotu.huobanplus.common.entity.Order mallOrder = ordersRestRepository.getOneByPK(orderId);
+        if (mallOrder == null) {
+            return null;
         }
-        solrOrder.setSupplierId(mallOrder.getSupplierId());
-        solrOrder.setUserName(mallOrder.getUserName());
         solrOrder.setReceiver(mallOrder.getReceiver());
         solrOrder.setShipMobile(mallOrder.getShipMobile());
         solrOrder.setCreateTime(mallOrder.getTime());
@@ -136,13 +156,6 @@ public class OrderServiceImpl implements OrderService {
         solrOrder.setPayStatus(mallOrder.getPayStatus());
         solrOrder.setShipStatus(mallOrder.getDeliverStatus());
         solrOrder.setSourceType(mallOrder.getSourceType());
-        if (mallOrder.getGoodsNameList() != null) {
-            StringBuilder sb = new StringBuilder("|");
-            mallOrder.getGoodsNameList().forEach(name -> {
-                sb.append(name).append("|");
-            });
-            solrOrder.setGoodsName(sb.toString());
-        }
         solrOrder.setPaymentType(mallOrder.getPayType());
         solrOrder.setShipDisabled(mallOrder.getShipDisabled());
         solrOrder.setFinalAmount(mallOrder.getPrice());

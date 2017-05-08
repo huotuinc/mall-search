@@ -54,7 +54,8 @@ public class ScheduleService {
 //            merchantId = 4886L;
         }
         Constant.PAGE_SIZE = env.getProperty("com.huotu.huobanplus.search.pageSize", Integer.class, 100);
-        new Thread(() -> {
+
+        /*new Thread(() -> {
             log.info("start goods sync");
             try {
                 Thread.sleep(10*1000);
@@ -62,7 +63,7 @@ public class ScheduleService {
             } catch (InterruptedException e) {
             }
             log.info("end goods sync");
-        }).start();
+        }).start();*/
         /*new Thread(() -> {
             log.info("start user sync");
             try {
@@ -75,11 +76,36 @@ public class ScheduleService {
     }
 
 
+    private boolean testConnectToHuobanplus(){
+        //确保能链接到huoabnplus了再继续往下走
+        boolean isSuccess = false;
+        int tryNum = 0;
+        while (tryNum < 3 && !isSuccess){
+            try {
+                goodsRestRepository.search(0, null, new PageRequest(0, 1));
+                isSuccess = true;
+                break;
+            }catch (IOException e){
+                try {
+                    log.info("connect to huobanplus error,wait 10s . . .");
+                    Thread.sleep(10 * 1000);
+                } catch (InterruptedException e1) {
+                }
+                tryNum ++;
+            }
+        }
+        return isSuccess;
+    }
+
+
     /**
      * 每天0点5分开始商品全量
      */
-//    @Scheduled(cron = "0 5 0 * * ?")
+    @Scheduled(cron = "0 15 1 * * ?")
     public void syncAllGoods() {
+        if(!testConnectToHuobanplus()){
+            return;
+        }
         log.info("start sync all goods");
         goodsService.updateByCustomerId(merchantId);
         log.info("end sync all goods");
@@ -88,9 +114,12 @@ public class ScheduleService {
     /**
      * 每小时的第5分钟开始商品增量
      */
-    @Scheduled(cron = "0 5 * * * ?")
+    @Scheduled(cron = "0 15 * * * ?")
 //    @Scheduled(cron = "0 */2 * * * ?")
     public void addGoods() throws IOException {
+        if(!testConnectToHuobanplus()){
+            return;
+        }
         if (goodsId == null || goodsId == 0) {
             goodsId = goodsService.maxId();
         }
@@ -109,8 +138,10 @@ public class ScheduleService {
                 Thread.sleep(10);
             } catch (IOException e) {
                 log.error("add goods at page " + pageNo + " error : " + e);
+                break;
             } catch (InterruptedException e) {
                 log.error("sleep error");
+                break;
             }
             pageNo++;
         }
@@ -120,10 +151,13 @@ public class ScheduleService {
 
 
     /**
-     * 每天0点5分开始商品全量
+     * 每天0点5分开始用户全量
      */
-    @Scheduled(cron = "0 5 0 * * ?")
+    @Scheduled(cron = "0 15 1 * * ?")
     public void syncAllUser() {
+        if(!testConnectToHuobanplus()){
+            return;
+        }
         log.info("start sync all user");
         userService.updateByCustomerId(merchantId);
         log.info("end sync all user");
@@ -132,9 +166,12 @@ public class ScheduleService {
     /**
      * 每小时的第5分钟开始用户增量
      */
-//    @Scheduled(cron = "0 5 * * * ?")
+    @Scheduled(cron = "0 15 * * * ?")
 //    @Scheduled(cron = "0 */5 * * * ?")
     public void addUsers() {
+        if(!testConnectToHuobanplus()){
+            return;
+        }
         if (userId == null || userId == 0) {
             userId = userService.maxId();
         }
@@ -153,8 +190,10 @@ public class ScheduleService {
                 Thread.sleep(10);
             } catch (IOException e) {
                 log.error("add user at page " + pageNo + " error :" + e);
+                break;
             } catch (InterruptedException e) {
                 log.error("sleep error");
+                break;
             }
             pageNo++;
         }
@@ -165,8 +204,11 @@ public class ScheduleService {
     /**
      * 每天0点5分开始订单全量
      */
-//    @Scheduled(cron = "0 5 0 * * ?")
+    @Scheduled(cron = "0 15 1 * * ?")
     public void syncAllOrder() {
+        if(!testConnectToHuobanplus()){
+            return;
+        }
         log.info("start sync all order");
         int pageNo = 0, pageSize = Constant.PAGE_SIZE;
         while (true) {
@@ -179,8 +221,10 @@ public class ScheduleService {
                 Thread.sleep(10);
             } catch (IOException e) {
                 log.error("sync order at page " + pageNo + "error : " + e);
+                break;
             } catch (InterruptedException e) {
                 log.error("sleep error");
+                break;
             }
             pageNo++;
             log.debug("sync order pageNo:" + pageNo + " success");
@@ -191,9 +235,12 @@ public class ScheduleService {
     /**
      * 每小时的第5分钟开始订单增量
      */
-//    @Scheduled(cron = "0 5 * * * ?")
+    @Scheduled(cron = "0 15 * * * ?")
 //    @Scheduled(cron = "0 */2 * * * ?")
     public void addOrder() {
+        if(!testConnectToHuobanplus()){
+            return;
+        }
         if (StringUtils.isEmpty(orderId)) {
             orderId = orderService.maxId();
         }
@@ -211,8 +258,10 @@ public class ScheduleService {
                 Thread.sleep(10);
             } catch (IOException e) {
                 log.error("add order at page " + pageNo + " error :" + e);
+                break;
             } catch (InterruptedException e) {
                 log.error("sleep error");
+                break;
             }
             pageNo++;
         }

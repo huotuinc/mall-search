@@ -22,6 +22,7 @@ public interface OrderController {
      * @param customerId      商户ID，必填
      * @param pageSize        每页尺寸 默认10
      * @param pageNo          当前页 默认0第一页
+     * @param exportSize      导出页数
      * @param orderId         订单号，精准匹配
      * @param unionOrderId    联合订单号，精准匹配
      * @param userLoginName   用户名，精准匹配
@@ -36,6 +37,7 @@ public interface OrderController {
      * @param supplierId      供应商主键
      * @param sourceType      订单类型
      * @param goodsName       商品名称。分词搜索
+     * @param goodsId         商品主键
      * @param payType         支付类型
      * @param shipDisabled    是否成团，1表示否；0表示成团
      * @param orderStatus     订单状态
@@ -49,9 +51,11 @@ public interface OrderController {
             , @RequestParam(value = "supplierId", required = false) Long supplierId
             , @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
             , @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo
+            , @RequestParam(value = "exportSize", required = false) Integer exportSize
             , @RequestParam(value = "orderId", required = false) String orderId
             , @RequestParam(value = "unionOrderId", required = false) String unionOrderId
             , @RequestParam(value = "goodsName", required = false) String goodsName
+            , @RequestParam(value = "goodsId", required = false) Integer goodsId
             , @RequestParam(value = "userLoginName", required = false) String userLoginName
             , @RequestParam(value = "shipName", required = false) String shipName
             , @RequestParam(value = "shipMobile", required = false) String shipMobile

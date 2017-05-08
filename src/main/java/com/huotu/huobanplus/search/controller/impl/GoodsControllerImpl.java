@@ -102,4 +102,17 @@ public class GoodsControllerImpl implements GoodsController {
         }
         return "success";
     }
+
+    @RequestMapping(value = "/updateByGoodsIds",method = RequestMethod.POST)
+    @ResponseBody
+    @Override
+    public String updateByGoodsIds(@RequestParam(value = "goodsIds") String... goodsIds) throws IOException {
+        if(goodsIds.length > 0){
+            for(String goodsIdStr : goodsIds){
+                Long goodsId = Long.parseLong(goodsIdStr);
+                goodsService.update(goodsId);
+            }
+        }
+        return "success";
+    }
 }

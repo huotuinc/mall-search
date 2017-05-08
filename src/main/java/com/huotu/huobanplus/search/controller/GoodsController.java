@@ -124,10 +124,21 @@ public interface GoodsController {
      *
      * @param customerId 商户ID
      * @param goodsId    商品ID
-     * @return
+     * @return 更新结果
      */
     @RequestMapping(value = "/updateByMerchant", method = RequestMethod.POST)
     @ResponseBody
     String updateByMerchantIdAndGoodsId(@RequestParam(value = "customerId") Long customerId,
                                         @RequestParam(value = "goodsId", required = false) Long goodsId) throws IOException;
+
+    /**
+     * 手动同步商品数据，主要用于商品的批量修改操作
+     *
+     * @param goodsIds 商品ID，以","分隔
+     * @return 更新结果
+     * @throws IOException
+     */
+    @RequestMapping(value = "/updateByGoodsIds",method = RequestMethod.POST)
+    @ResponseBody
+    String updateByGoodsIds(@RequestParam(value = "goodsIds") String... goodsIds) throws IOException;
 }

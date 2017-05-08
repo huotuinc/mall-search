@@ -32,9 +32,11 @@ public class OrderControllerImpl implements OrderController {
             , @RequestParam(value = "supplierId", required = false) Long supplierId
             , @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
             , @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo
+            , @RequestParam(value = "exportSize", required = false) Integer exportSize
             , @RequestParam(value = "orderId", required = false) String orderId
             , @RequestParam(value = "unionOrderId", required = false) String unionOrderId
             , @RequestParam(value = "goodsName", required = false) String goodsName
+            , @RequestParam(value = "goodsId", required = false) Integer goodsId
             , @RequestParam(value = "userLoginName", required = false) String userLoginName
             , @RequestParam(value = "shipName", required = false) String shipName
             , @RequestParam(value = "shipMobile", required = false) String shipMobile
@@ -50,10 +52,10 @@ public class OrderControllerImpl implements OrderController {
             , @RequestParam(value = "shipDisabled", required = false) Boolean shipDisabled
             , @RequestParam(value = "sortType", defaultValue = "0") Integer sortType
             , @RequestParam(value = "sortDir", defaultValue = "1") Integer sortDir) {
-        ViewList result = orderService.search(customerId,supplierId,pageSize,pageNo,
-                orderId,unionOrderId,goodsName,userLoginName,shipName,shipMobile,
-                ToolUtils.getDateFromString(createBeginTime),ToolUtils.getDateFromString(createEndTime),ToolUtils.getDateFromString(payBeginTime),ToolUtils.getDateFromString(payEndTime),
-                payStatus,shipStatus,orderStatus,sourceType,payType,shipDisabled,getSortColumnFromSortType(sortType),getSortDirect(sortDir));
+        ViewList result = orderService.search(customerId, supplierId, pageSize, pageNo, exportSize,
+                orderId, unionOrderId, goodsName, goodsId, userLoginName, shipName, shipMobile,
+                ToolUtils.getDateFromString(createBeginTime), ToolUtils.getDateFromString(createEndTime), ToolUtils.getDateFromString(payBeginTime), ToolUtils.getDateFromString(payEndTime),
+                payStatus, shipStatus, orderStatus, sourceType, payType, shipDisabled, getSortColumnFromSortType(sortType), getSortDirect(sortDir));
         return result;
     }
 
@@ -61,9 +63,9 @@ public class OrderControllerImpl implements OrderController {
     @ResponseBody
     @Override
     public String updateByMerchantIdAndOrderId(@RequestParam(value = "customerId") Long customerId, @RequestParam(value = "orderId", required = false) String orderId) throws IOException {
-        if(StringUtils.isEmpty(orderId)){
+        if (StringUtils.isEmpty(orderId)) {
             orderService.updateByCustomerId(customerId);
-        }else{
+        } else {
             orderService.update(orderId);
         }
         return "success";

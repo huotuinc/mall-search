@@ -71,6 +71,10 @@ public class Order {
     private String goodsName;
 
     @Field
+    @Description("商品ID")
+    private String goodsId;
+
+    @Field
     @Description("支付类型")
     private Integer paymentType;
 

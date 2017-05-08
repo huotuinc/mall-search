@@ -104,9 +104,10 @@ public class GoodsServiceImpl implements GoodsService {
                         "update data last " + (update - end) + " ms");
                 goodsId = mallGoodsPage.getContent().get(mallGoodsPage.getNumberOfElements() - 1).getId();
             } catch (InterruptedException e) {
-                log.error("sleep error");
+                log.error("sleep error",e);
                 break;
             } catch (IOException e) {
+                log.error("get data error" ,e);
                 e.printStackTrace();
                 break;
             }
@@ -164,12 +165,13 @@ public class GoodsServiceImpl implements GoodsService {
         solrGoods.setTypeId(mallGoods.getSolrGoods().getTypeId());
         solrGoods.setCatId(mallGoods.getSolrGoods().getCategoryId());
         solrGoods.setSupplierId(mallGoods.getSolrGoods().getSupplierId());
-        if(mallGoods.getSolrGoods().getSmallPic() != null){
-            solrGoods.setSmallPic(mallGoods.getSolrGoods().getSmallPic().getValue());
-        }
+        solrGoods.setSmallPic(mallGoods.getSolrGoods().getSmallPic());
         solrGoods.setBrief(mallGoods.getSolrGoods().getBrief());
         solrGoods.setMarketPrice(mallGoods.getSolrGoods().getMarketPrice());
         solrGoods.setPrice(mallGoods.getSolrGoods().getPrice());
+        if(mallGoods.getSolrGoods().getMinUserPrices() != null){
+            solrGoods.setMinUserPrice(mallGoods.getSolrGoods().getMinUserPrices());
+        }
         solrGoods.setSpec(mallGoods.getSolrGoods().getSpec());
         solrGoods.setPdtDesc(mallGoods.getSolrGoods().getPdtDesc());
         solrGoods.setSpecDesc(mallGoods.getSolrGoods().getSpecDesc());
@@ -189,69 +191,7 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     private Goods mallGoodsToSolrGoods(Long goodsId, Goods goods) throws IOException {
-        com.huotu.huobanplus.common.entity.Goods mallGoods = goodsRestRepository.getOneByPK(goodsId);
-        if (mallGoods == null) {
-            return null;
-        }
-        if (goods == null) {
-            goods = new Goods();
-            goods.setId(mallGoods.getId());
-        }
-        if (mallGoods.getOwner() != null) {
-            goods.setCustomerId(mallGoods.getOwner().getId());
-        }
-        if (mallGoods.getSaleShopId() != null) {
-            goods.setOwnerId(mallGoods.getSaleShopId());
-        } else {
-            goods.setOwnerId(0L);
-        }
-        goods.setTitle(mallGoods.getTitle());
-        if (mallGoods.getBrand() != null) {
-            goods.setBrandId(mallGoods.getBrand().getId());
-            goods.setBrandName(mallGoods.getBrand().getBrandName());
-        }
-        if (mallGoods.getCategory() != null) {
-            goods.setCategoriesId(mallGoods.getCategory().getCatPath());
-            // TODO: 2017-02-24 这里就不获取上级分类了，有需要了再作修改
-            goods.setCategoryName(mallGoods.getCategory().getTitle());
-        }
-        goods.setDescription(mallGoods.getDescription());
-        SaleTags saleTags;
-        if (mallGoods.isUseCustomSaleTags()) {
-            saleTags = mallGoods.getCustomSaleTags();
-        } else {
-            saleTags = mallGoods.getSaleTags();
-        }
-        if (saleTags != null) {
-            goods.setHotspot(StringUtils.arrayToDelimitedString(saleTags.getTags(), "|"));
-        }
-
-        List<GoodsKeywords> mallGoodsKeywords = goodsKeywordsRestRepository.findAllByGoodsId(mallGoods.getId());
-        if (mallGoodsKeywords != null) {
-            StringBuilder keyword = new StringBuilder("|");
-            for (GoodsKeywords goodsKeywords : mallGoodsKeywords) {
-                if (goodsKeywords.getPk() != null && !StringUtils.isEmpty(goodsKeywords.getPk().getKeyword())) {
-                    keyword.append(goodsKeywords.getPk().getKeyword()).append("|");
-                }
-            }
-            goods.setKeyword(keyword.toString());
-        }
-
-        Set<MallTag> mallTags = mallGoods.getTags();
-        if (mallTags != null && mallTags.size() > 0) {
-            StringBuilder tags = new StringBuilder("|");
-            StringBuilder tagIds = new StringBuilder("|");
-            for (MallTag mallTag : mallTags) {
-                tags.append(mallTag.getTagName()).append("|");
-                tagIds.append(mallTag.getId()).append("|");
-            }
-            goods.setTags(tags.toString());
-            goods.setTagIds(tagIds.toString());
-        }
-        goods.setUpdateTime(mallGoods.getAutoMarketDate());
-        goods.setSales((long) mallGoods.getSalesCount());
-        goods.setOriginalPrice((float) mallGoods.getPrice());
-        goods.setDisabled(mallGoods.isDisabled());
-        return goods;
+        com.huotu.huobanplus.common.entity.Goods mallGoods = goodsRestRepository.findSolrGoodsById(goodsId);
+        return mallGoodsToSolrGoods(mallGoods,goods);
     }
 }

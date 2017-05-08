@@ -108,10 +108,10 @@ public class SolrGoodsRepository extends SimpleSolrRepository<Goods, Long> {
                     orderList.add(new Sort.Order(Sort.Direction.ASC,"sales"));
                     break;
                 case "5":
-                    orderList.add(new Sort.Order(Sort.Direction.DESC,"originalPrice"));
+                    orderList.add(new Sort.Order(Sort.Direction.DESC,"minUserPrice"));
                     break;
                 case "6":
-                    orderList.add(new Sort.Order(Sort.Direction.ASC,"originalPrice"));
+                    orderList.add(new Sort.Order(Sort.Direction.ASC,"minUserPrice"));
                     break;
             }
         }

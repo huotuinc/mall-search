@@ -100,9 +100,11 @@ public class UserServiceImpl implements UserService {
             } catch (IOException e) {
                 log.error("sync users start id " + userId + ", pageNo:" + pageNo + " error");
                 //为了防止因为某个ID的查询失败而无法同步后面的数据，在此跳过这个ID
-                userId++;
+//                userId++;
+                break;
             } catch (InterruptedException e) {
                 log.error("sleep error");
+                break;
             }
 //            pageNo++;
             log.debug("sync users start id " + userId + ", pageNo:" + pageNo + " success");
